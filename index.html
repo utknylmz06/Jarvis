@@ -491,6 +491,7 @@
     statusLabel.classList.add('active');
 
     const isOverloaded = (msg) => /high demand|overloaded|unavailable|503/i.test(msg || '');
+    const isQuota = (msg) => /quota|rate limit|429|exceeded/i.test(msg || '');
     let lastErr = null;
 
     for (let attempt = 0; attempt < 2; attempt++) {
@@ -508,12 +509,16 @@
         return;
       } catch (err) {
         lastErr = err;
-        if (!isOverloaded(err.message)) break; // başka türden hata ise tekrar denemeden çık
+        if (!isOverloaded(err.message)) break; // kota veya başka hata ise tekrar deneme, kotayı boşa harcama
       }
     }
 
     log('sys', 'gemini hatası: ' + lastErr.message);
-    if (isOverloaded(lastErr.message)) {
+    if (isQuota(lastErr.message)) {
+      const secMatch = lastErr.message.match(/retry in\s*([\d.]+)\s*s/i);
+      const waitMsg = secMatch ? ` Yaklaşık ${Math.ceil(parseFloat(secMatch[1]))} saniye sonra tekrar deneyebilirsiniz.` : ' Biraz sonra tekrar deneyin.';
+      speak('Gemini için ücretsiz kullanım kotanız doldu efendim.' + waitMsg);
+    } else if (isOverloaded(lastErr.message)) {
       speak('Gemini şu anda yoğun efendim, birkaç saniye sonra tekrar sorar mısınız?');
     } else {
       speak('Gemini ile bağlantı kurarken bir sorun oluştu efendim: ' + lastErr.message);
@@ -568,7 +573,10 @@
         }
       }
       if (finalText.trim()) {
-        handleUserSpeech(finalText.trim());
+        const cleaned = finalText.trim();
+        // çok kısa / anlamsız algılamaları yok say (ortam gürültüsü, tek harf vb.)
+        if (cleaned.replace(/\s/g, '').length < 2) return;
+        handleUserSpeech(cleaned);
       }
     };
 
@@ -583,13 +591,10 @@
     };
 
     recognition.onend = () => {
+      // Tarayıcı sessizlik nedeniyle kendiliğinden durdurmuş olabilir —
+      // otomatik yeniden başlatma YOK, sadece siz daireye tıklayınca dinler.
       listening = false;
-      // auto-restart if user hasn't manually stopped and we're not currently speaking
-      if (!manuallyStopped && !speaking) {
-        try { recognition.start(); listening = true; setListeningUI(true); } catch(e) {}
-      } else {
-        setListeningUI(false);
-      }
+      setListeningUI(false);
     };
   }
 
@@ -608,10 +613,10 @@
     log('jarvis', text);
     if (!('speechSynthesis' in window)) return;
 
-    // pause recognition while jarvis talks, to avoid self-listening
-    const wasListening = listening;
+    // konuşurken mikrofonu kapat (kendi sesini dinlemesin) — konuşma bitince
+    // otomatik tekrar dinlemeye BAŞLAMAZ, kullanıcı daireye tekrar tıklamalı.
     if (recognition && listening) {
-      manuallyStopped_temp = true;
+      manuallyStopped = true;
       try { recognition.stop(); } catch(e) {}
     }
 
@@ -627,9 +632,6 @@
     utter.onend = utter.onerror = () => {
       speaking = false;
       setSpeakingUI(false);
-      if (wasListening && !manuallyStopped) {
-        try { recognition.start(); listening = true; setListeningUI(true); } catch(e) {}
-      }
     };
 
     window.speechSynthesis.speak(utter);
