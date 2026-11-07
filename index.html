@@ -334,7 +334,7 @@
       
     } catch (err) {
       isThinking = false;
-      .name === 'AbortError') {
+      if (err.name === 'AbortError') {
         log('sys', 'Hata: İstek zaman aşımına uğradı. Sunucu yanıt vermiyor.');
       } else {
         log('sys', 'Hata: ' + err.message);
