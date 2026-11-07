@@ -28,204 +28,72 @@
     overflow:hidden;
     -webkit-tap-highlight-color: transparent;
   }
-  /* faint grid backdrop */
   body::before{
-    content:"";
-    position:fixed; inset:0;
-    background-image:
-      linear-gradient(rgba(78,227,255,.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(78,227,255,.05) 1px, transparent 1px);
-    background-size: 42px 42px;
-    mask-image: radial-gradient(ellipse at 50% 45%, black 10%, transparent 72%);
-    pointer-events:none;
-    z-index:0;
+    content:""; position:fixed; inset:0;
+    background-image: linear-gradient(rgba(78,227,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(78,227,255,.05) 1px, transparent 1px);
+    background-size: 42px 42px; mask-image: radial-gradient(ellipse at 50% 45%, black 10%, transparent 72%);
+    pointer-events:none; z-index:0;
   }
   .scanline{
     position:fixed; inset:0; pointer-events:none; z-index:5;
     background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.018) 0px, rgba(255,255,255,0.018) 1px, transparent 2px, transparent 3px);
     opacity:.5;
   }
-
-  .app{
-    position:relative; z-index:2;
-    height:100%; width:100%;
-    display:flex; flex-direction:column;
-    padding: 18px 22px 14px;
-  }
-
-  /* ===== HEADER / HUD TOP BAR ===== */
-  header{
-    display:flex; justify-content:space-between; align-items:flex-start;
-    font-family:'Share Tech Mono', monospace;
-    font-size:11px; letter-spacing:.08em; color:var(--text-dim);
-  }
-  .brand{
-    font-family:'Orbitron',sans-serif;
-    font-weight:900;
-    font-size:clamp(18px,4vw,26px);
-    color:var(--cyan);
-    letter-spacing:.18em;
-    text-shadow:0 0 14px var(--cyan-glow);
-    line-height:1;
-  }
-  .brand small{
-    display:block; font-family:'Share Tech Mono',monospace;
-    font-size:9px; letter-spacing:.25em; color:var(--text-dim); font-weight:400; margin-top:4px;
-  }
+  .app{ position:relative; z-index:2; height:100%; width:100%; display:flex; flex-direction:column; padding: 18px 22px 14px; }
+  header{ display:flex; justify-content:space-between; align-items:flex-start; font-family:'Share Tech Mono', monospace; font-size:11px; letter-spacing:.08em; color:var(--text-dim); }
+  .brand{ font-family:'Orbitron',sans-serif; font-weight:900; font-size:clamp(18px,4vw,26px); color:var(--cyan); letter-spacing:.18em; text-shadow:0 0 14px var(--cyan-glow); line-height:1; }
+  .brand small{ display:block; font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:.25em; color:var(--text-dim); font-weight:400; margin-top:4px; }
   .clock{ text-align:right; }
   .clock .time{ font-size:20px; color:var(--cyan); }
   .clock .date{ margin-top:2px; text-transform:uppercase; }
-
   .hdr-right{ display:flex; align-items:flex-start; gap:12px; }
-  .gear-btn{
-    background:transparent; border:1px solid var(--panel-border); border-radius:5px;
-    color:var(--cyan-dim); width:32px; height:32px; cursor:pointer;
-    display:flex; align-items:center; justify-content:center;
-    transition: color .2s, border-color .2s, box-shadow .2s;
-  }
+  .gear-btn{ background:transparent; border:1px solid var(--panel-border); border-radius:5px; color:var(--cyan-dim); width:32px; height:32px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition: color .2s, border-color .2s, box-shadow .2s; }
   .gear-btn:hover{ color:var(--cyan); border-color:var(--cyan); box-shadow:0 0 10px rgba(78,227,255,.25); }
   .gear-btn svg path{ fill:currentColor; }
   .gear-btn.connected{ color:var(--cyan); border-color:var(--cyan); box-shadow:0 0 10px rgba(78,227,255,.25); }
-
-  /* settings panel */
-  .settings-panel{
-    position:fixed; inset:0; z-index:40;
-    background:rgba(2,5,9,.72); backdrop-filter: blur(3px);
-    display:flex; align-items:center; justify-content:center;
-    opacity:0; visibility:hidden; transition: opacity .25s, visibility .25s;
-    padding:20px;
-  }
+  .settings-panel{ position:fixed; inset:0; z-index:40; background:rgba(2,5,9,.72); backdrop-filter: blur(3px); display:flex; align-items:center; justify-content:center; opacity:0; visibility:hidden; transition: opacity .25s, visibility .25s; padding:20px; }
   .settings-panel.open{ opacity:1; visibility:visible; }
-  .settings-inner{
-    width:100%; max-width:380px;
-    background: linear-gradient(180deg, rgba(10,24,40,.95), rgba(4,10,17,.98));
-    border:1px solid var(--panel-border); border-radius:8px;
-    padding:22px; box-shadow:0 0 40px rgba(78,227,255,.15);
-  }
-  .settings-title{
-    font-family:'Orbitron',sans-serif; color:var(--cyan); letter-spacing:.18em;
-    font-size:14px; margin-bottom:10px;
-  }
+  .settings-inner{ width:100%; max-width:380px; background: linear-gradient(180deg, rgba(10,24,40,.95), rgba(4,10,17,.98)); border:1px solid var(--panel-border); border-radius:8px; padding:22px; box-shadow:0 0 40px rgba(78,227,255,.15); }
+  .settings-title{ font-family:'Orbitron',sans-serif; color:var(--cyan); letter-spacing:.18em; font-size:14px; margin-bottom:10px; }
   .settings-desc{ font-size:12.5px; color:var(--text-dim); line-height:1.6; margin-bottom:16px; }
-  #apiKeyInput{
-    width:100%; background:#040c14; border:1px solid var(--panel-border); color:var(--text);
-    padding:10px 12px; border-radius:4px; font-family:'Share Tech Mono',monospace; font-size:12.5px;
-    outline:none; margin-bottom:12px;
-  }
+  #apiKeyInput{ width:100%; background:#040c14; border:1px solid var(--panel-border); color:var(--text); padding:10px 12px; border-radius:4px; font-family:'Share Tech Mono',monospace; font-size:12.5px; outline:none; margin-bottom:12px; }
   #apiKeyInput:focus{ border-color:var(--cyan); }
   .remember-row{ display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--text-dim); margin-bottom:18px; }
   .settings-actions{ display:flex; gap:10px; }
-  .settings-actions button{
-    flex:1; font-family:'Orbitron',sans-serif; letter-spacing:.1em; font-size:11.5px;
-    padding:10px; border-radius:4px; cursor:pointer; border:1px solid var(--cyan); background:var(--cyan); color:#04121a;
-    transition: opacity .2s;
-  }
+  .settings-actions button{ flex:1; font-family:'Orbitron',sans-serif; letter-spacing:.1em; font-size:11.5px; padding:10px; border-radius:4px; cursor:pointer; border:1px solid var(--cyan); background:var(--cyan); color:#04121a; transition: opacity .2s; }
   .settings-actions button:hover{ opacity:.85; }
   .settings-actions button.ghost{ background:transparent; color:var(--cyan); }
   .settings-status{ margin-top:12px; font-size:11.5px; color:var(--text-dim); font-family:'Share Tech Mono',monospace; min-height:14px; }
   .settings-status.ok{ color:var(--cyan); }
   .settings-status.err{ color:var(--red); }
-
-  /* corner brackets */
   .bracket{ position:fixed; width:26px; height:26px; border-color:var(--cyan-dim); opacity:.7; z-index:4;}
   .bracket.tl{ top:14px; left:14px; border-top:2px solid; border-left:2px solid;}
   .bracket.tr{ top:14px; right:14px; border-top:2px solid; border-right:2px solid;}
   .bracket.bl{ bottom:14px; left:14px; border-bottom:2px solid; border-left:2px solid;}
   .bracket.br{ bottom:14px; right:14px; border-bottom:2px solid; border-right:2px solid;}
-
-  /* ===== CENTER STAGE ===== */
-  .stage{
-    flex:1;
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    position:relative;
-    min-height:0;
-  }
-
-  .status-label{
-    font-family:'Orbitron',sans-serif;
-    font-size:clamp(11px,2.4vw,14px);
-    letter-spacing:.3em;
-    color:var(--cyan-dim);
-    text-transform:uppercase;
-    margin-bottom:22px;
-    transition: color .3s, text-shadow .3s;
-    text-align:center;
-  }
+  .stage{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; min-height:0; }
+  .status-label{ font-family:'Orbitron',sans-serif; font-size:clamp(11px,2.4vw,14px); letter-spacing:.3em; color:var(--cyan-dim); text-transform:uppercase; margin-bottom:22px; transition: color .3s, text-shadow .3s; text-align:center; }
   .status-label.active{ color:var(--cyan); text-shadow:0 0 12px var(--cyan-glow); }
   .status-label.speaking{ color:var(--amber); text-shadow:0 0 12px rgba(255,182,72,.6); }
-
-  .core-wrap{
-    position:relative;
-    width: min(58vw, 320px);
-    height: min(58vw, 320px);
-    display:flex; align-items:center; justify-content:center;
-  }
-
-  .ring{
-    position:absolute; border-radius:50%;
-    border:1px solid var(--panel-border);
-  }
+  .core-wrap{ position:relative; width: min(58vw, 320px); height: min(58vw, 320px); display:flex; align-items:center; justify-content:center; }
+  .ring{ position:absolute; border-radius:50%; border:1px solid var(--panel-border); }
   .ring.r1{ inset:0; animation: spin 22s linear infinite; border-style:dashed; }
   .ring.r2{ inset:10%; animation: spin 16s linear infinite reverse; }
   .ring.r3{ inset:20%; animation: spin 30s linear infinite; border-color: rgba(78,227,255,.12); }
   @keyframes spin{ to{ transform:rotate(360deg); } }
-
   .ticks{ position:absolute; inset:0; }
-  .ticks span{
-    position:absolute; left:50%; top:2px; width:1px; height:9px;
-    background:var(--cyan-dim); transform-origin:50% calc(min(29vw,160px) - 2px);
-    opacity:.5;
-  }
-
-  .core-btn{
-    position:relative;
-    width:46%; height:46%;
-    border-radius:50%;
-    border:none; cursor:pointer;
-    background: radial-gradient(circle at 50% 40%, #0e2a3b 0%, #071822 55%, #030a10 100%);
-    box-shadow:
-      0 0 0 1px rgba(78,227,255,.35),
-      0 0 24px rgba(78,227,255,.25),
-      inset 0 0 30px rgba(78,227,255,.15);
-    display:flex; align-items:center; justify-content:center;
-    transition: box-shadow .35s ease, transform .2s ease;
-    z-index:3;
-  }
+  .ticks span{ position:absolute; left:50%; top:2px; width:1px; height:9px; background:var(--cyan-dim); transform-origin:50% calc(min(29vw,160px) - 2px); opacity:.5; }
+  .core-btn{ position:relative; width:46%; height:46%; border-radius:50%; border:none; cursor:pointer; background: radial-gradient(circle at 50% 40%, #0e2a3b 0%, #071822 55%, #030a10 100%); box-shadow: 0 0 0 1px rgba(78,227,255,.35), 0 0 24px rgba(78,227,255,.25), inset 0 0 30px rgba(78,227,255,.15); display:flex; align-items:center; justify-content:center; transition: box-shadow .35s ease, transform .2s ease; z-index:3; }
   .core-btn:active{ transform:scale(.97); }
-  .core-btn.listening{
-    box-shadow:
-      0 0 0 1px rgba(78,227,255,.7),
-      0 0 45px rgba(78,227,255,.65),
-      inset 0 0 40px rgba(78,227,255,.35);
-    animation: pulse 1.6s ease-in-out infinite;
-  }
-  .core-btn.speaking{
-    box-shadow:
-      0 0 0 1px rgba(255,182,72,.75),
-      0 0 45px rgba(255,182,72,.55),
-      inset 0 0 40px rgba(255,182,72,.3);
-  }
-  @keyframes pulse{
-    0%,100%{ transform:scale(1); }
-    50%{ transform:scale(1.035); }
-  }
-
+  .core-btn.listening{ box-shadow: 0 0 0 1px rgba(78,227,255,.7), 0 0 45px rgba(78,227,255,.65), inset 0 0 40px rgba(78,227,255,.35); animation: pulse 1.6s ease-in-out infinite; }
+  .core-btn.speaking{ box-shadow: 0 0 0 1px rgba(255,182,72,.75), 0 0 45px rgba(255,182,72,.55), inset 0 0 40px rgba(255,182,72,.3); }
+  @keyframes pulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.035); } }
   .mic-icon{ width:34%; height:34%; z-index:2; }
   .mic-icon path{ fill:var(--cyan); transition:fill .3s; filter:drop-shadow(0 0 6px var(--cyan-glow));}
   .core-btn.speaking .mic-icon path{ fill:var(--amber); filter:drop-shadow(0 0 6px rgba(255,182,72,.6)); }
-
-  /* waveform bars shown while listening/speaking, centered over core */
-  .wave{
-    position:absolute; display:flex; align-items:center; gap:3px;
-    opacity:0; transition:opacity .25s;
-  }
+  .wave{ position:absolute; display:flex; align-items:center; gap:3px; opacity:0; transition:opacity .25s; }
   .wave.on{ opacity:1; }
-  .wave span{
-    width:3px; border-radius:2px; background:var(--cyan);
-    box-shadow:0 0 6px var(--cyan-glow);
-    height:6px;
-    animation: wave 1s ease-in-out infinite;
-  }
+  .wave span{ width:3px; border-radius:2px; background:var(--cyan); box-shadow:0 0 6px var(--cyan-glow); height:6px; animation: wave 1s ease-in-out infinite; }
   .core-btn.speaking ~ .wave span, .wave.amber span{ background:var(--amber); box-shadow:0 0 6px rgba(255,182,72,.6);}
   .wave span:nth-child(1){ animation-delay:0s; }
   .wave span:nth-child(2){ animation-delay:.12s; }
@@ -233,26 +101,8 @@
   .wave span:nth-child(4){ animation-delay:.36s; }
   .wave span:nth-child(5){ animation-delay:.48s; }
   @keyframes wave{ 0%,100%{ height:6px; } 50%{ height:26px; } }
-
-  .hint{
-    margin-top:22px; font-size:12px; color:var(--text-dim);
-    font-family:'Share Tech Mono',monospace; text-align:center; letter-spacing:.05em;
-    max-width:320px;
-  }
-
-  /* ===== TRANSCRIPT LOG ===== */
-  .log-panel{
-    height: 26vh; min-height:120px; max-height:220px;
-    border:1px solid var(--panel-border);
-    background: linear-gradient(180deg, rgba(8,20,34,.55), rgba(3,9,15,.75));
-    border-radius:6px;
-    padding:10px 14px;
-    overflow-y:auto;
-    font-family:'Share Tech Mono', monospace;
-    font-size:12.5px;
-    line-height:1.6;
-    backdrop-filter: blur(2px);
-  }
+  .hint{ margin-top:22px; font-size:12px; color:var(--text-dim); font-family:'Share Tech Mono',monospace; text-align:center; letter-spacing:.05em; max-width:320px; }
+  .log-panel{ height: 26vh; min-height:120px; max-height:220px; border:1px solid var(--panel-border); background: linear-gradient(180deg, rgba(8,20,34,.55), rgba(3,9,15,.75)); border-radius:6px; padding:10px 14px; overflow-y:auto; font-family:'Share Tech Mono', monospace; font-size:12.5px; line-height:1.6; backdrop-filter: blur(2px); }
   .log-panel::-webkit-scrollbar{ width:5px; }
   .log-panel::-webkit-scrollbar-thumb{ background:var(--cyan-dim); border-radius:3px; }
   .log-line{ margin-bottom:6px; opacity:0; animation: fadein .3s forwards; }
@@ -261,38 +111,15 @@
   .log-line.user .who{ color:var(--amber); }
   .log-line.jarvis .who{ color:var(--cyan); }
   .log-line.sys{ color:var(--text-dim); font-style:italic; }
-
-  /* ===== PERMISSION OVERLAY ===== */
-  .overlay{
-    position:fixed; inset:0; z-index:50;
-    background: radial-gradient(ellipse at 50% 40%, #0b1c2d 0%, #020509 80%);
-    display:flex; align-items:center; justify-content:center;
-    flex-direction:column; text-align:center; padding:30px;
-    transition: opacity .5s ease, visibility .5s;
-  }
+  .overlay{ position:fixed; inset:0; z-index:50; background: radial-gradient(ellipse at 50% 40%, #0b1c2d 0%, #020509 80%); display:flex; align-items:center; justify-content:center; flex-direction:column; text-align:center; padding:30px; transition: opacity .5s ease, visibility .5s; }
   .overlay.hidden{ opacity:0; visibility:hidden; pointer-events:none; }
-  .overlay h1{
-    font-family:'Orbitron',sans-serif; color:var(--cyan); letter-spacing:.2em;
-    font-size:clamp(20px,5vw,30px); text-shadow:0 0 16px var(--cyan-glow);
-    margin-bottom:14px;
-  }
+  .overlay h1{ font-family:'Orbitron',sans-serif; color:var(--cyan); letter-spacing:.2em; font-size:clamp(20px,5vw,30px); text-shadow:0 0 16px var(--cyan-glow); margin-bottom:14px; }
   .overlay p{ color:var(--text-dim); max-width:420px; font-size:14px; margin-bottom:26px; line-height:1.6;}
-  .overlay button{
-    font-family:'Orbitron',sans-serif; letter-spacing:.15em;
-    background:transparent; color:var(--cyan); border:1px solid var(--cyan);
-    padding:12px 28px; border-radius:3px; cursor:pointer; font-size:13px;
-    box-shadow:0 0 14px rgba(78,227,255,.2);
-    transition: background .25s, color .25s, box-shadow .25s;
-  }
+  .overlay button{ font-family:'Orbitron',sans-serif; letter-spacing:.15em; background:transparent; color:var(--cyan); border:1px solid var(--cyan); padding:12px 28px; border-radius:3px; cursor:pointer; font-size:13px; box-shadow:0 0 14px rgba(78,227,255,.2); transition: background .25s, color .25s, box-shadow .25s; }
   .overlay button:hover{ background:var(--cyan); color:#04121a; box-shadow:0 0 26px var(--cyan-glow); }
   .overlay .small{ margin-top:16px; font-size:11px; color:var(--text-dim); font-family:'Share Tech Mono',monospace; }
   .overlay .err{ color:var(--red); margin-top:14px; font-size:12px; font-family:'Share Tech Mono',monospace; max-width:380px; }
-
-  @media (max-width:480px){
-    header{font-size:9px;}
-    .brand{font-size:17px;}
-    .log-panel{font-size:11.5px;}
-  }
+  @media (max-width:480px){ header{font-size:9px;} .brand{font-size:17px;} .log-panel{font-size:11.5px;} }
 </style>
 </head>
 <body>
@@ -303,7 +130,6 @@
 <div class="bracket bl"></div>
 <div class="bracket br"></div>
 
-<!-- Permission gate -->
 <div class="overlay" id="overlay">
   <h1>J.A.R.V.I.S. ÇEVRİMİÇİ</h1>
   <p>Sesli komut sistemini başlatmak için mikrofon erişimine ihtiyacım var, efendim. Aşağıdaki butona basın ve tarayıcı izin isteğini onaylayın.</p>
@@ -326,11 +152,10 @@
     </div>
   </header>
 
-  <!-- Gemini settings panel -->
   <div class="settings-panel" id="settingsPanel">
     <div class="settings-inner">
       <div class="settings-title">GEMINI BAĞLANTISI</div>
-      <p class="settings-desc">API anahtarınız yalnızca bu cihazda, bu sayfa açıkken hafızada tutulur; sunucuya gönderilmez. İsterseniz tarayıcıda saklanmasını seçebilirsiniz.</p>
+      <p class="settings-desc">API anahtarınız yalnızca bu cihazda, bu sayfa açıkken hafızada tutulur; sunucuya gönderilmez.</p>
       <input type="password" id="apiKeyInput" placeholder="Gemini API anahtarınızı yapıştırın">
       <label class="remember-row"><input type="checkbox" id="rememberKey"> Bu cihazda hatırla</label>
       <div class="settings-actions">
@@ -371,9 +196,8 @@
 
 <script>
 (() => {
+  // Elementler
   const overlay = document.getElementById('overlay');
-  const overlaySub = document.getElementById('overlaySub');
-  const overlayErr = document.getElementById('overlayErr');
   const grantBtn = document.getElementById('grantBtn');
   const coreBtn = document.getElementById('coreBtn');
   const statusLabel = document.getElementById('statusLabel');
@@ -382,7 +206,6 @@
   const logPanel = document.getElementById('log');
   const clockTime = document.getElementById('clockTime');
   const clockDate = document.getElementById('clockDate');
-  const ticksWrap = document.getElementById('ticks');
   const gearBtn = document.getElementById('gearBtn');
   const settingsPanel = document.getElementById('settingsPanel');
   const apiKeyInput = document.getElementById('apiKeyInput');
@@ -391,8 +214,28 @@
   const closeSettingsBtn = document.getElementById('closeSettingsBtn');
   const settingsStatus = document.getElementById('settingsStatus');
 
-  /* ============ GEMINI CONNECTION ============ */
-  const GEMINI_MODEL = 'gemini-flash-latest';
+  // Saat Güncellemesi
+  setInterval(() => {
+    const now = new Date();
+    clockTime.textContent = now.toLocaleTimeString('tr-TR');
+    clockDate.textContent = now.toLocaleDateString('tr-TR', { weekday: 'short', day: 'numeric', month: 'short' });
+  }, 1000);
+
+  // Log Fonksiyonu
+  function log(who, text) {
+    const div = document.createElement('div');
+    div.className = `log-line ${who}`;
+    const whoSpan = document.createElement('span');
+    whoSpan.className = 'who';
+    whoSpan.textContent = who === 'user' ? 'SEN:' : who === 'jarvis' ? 'JARVIS:' : 'SİSTEM:';
+    div.appendChild(whoSpan);
+    div.appendChild(document.createTextNode(text));
+    logPanel.appendChild(div);
+    logPanel.scrollTop = logPanel.scrollHeight;
+  }
+
+  // Gemini Ayarları
+  const GEMINI_MODEL = 'gemini-1.5-flash'; // Düzeltildi
   const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
   let geminiKey = '';
 
@@ -402,17 +245,15 @@
   } catch(e) {}
   if (geminiKey) { gearBtn.classList.add('connected'); }
 
-  function openSettings() {
+  gearBtn.addEventListener('click', () => {
     apiKeyInput.value = geminiKey || '';
     settingsStatus.textContent = geminiKey ? 'Gemini bağlı.' : 'Henüz bağlı değil.';
     settingsStatus.className = 'settings-status' + (geminiKey ? ' ok' : '');
     settingsPanel.classList.add('open');
-  }
-  function closeSettings() { settingsPanel.classList.remove('open'); }
-
-  gearBtn.addEventListener('click', openSettings);
-  closeSettingsBtn.addEventListener('click', closeSettings);
-  settingsPanel.addEventListener('click', (e) => { if (e.target === settingsPanel) closeSettings(); });
+  });
+  
+  closeSettingsBtn.addEventListener('click', () => settingsPanel.classList.remove('open'));
+  settingsPanel.addEventListener('click', (e) => { if (e.target === settingsPanel) settingsPanel.classList.remove('open'); });
 
   saveKeyBtn.addEventListener('click', () => {
     const val = apiKeyInput.value.trim();
@@ -429,8 +270,8 @@
     } catch(e) {}
     settingsStatus.textContent = 'Kaydedildi. Gemini bağlandı.';
     settingsStatus.className = 'settings-status ok';
-    log('sys', 'gemini api anahtarı kaydedildi');
-    setTimeout(closeSettings, 700);
+    log('sys', 'Gemini API anahtarı kaydedildi');
+    setTimeout(() => settingsPanel.classList.remove('open'), 700);
   });
 
   const GEMINI_SYSTEM_INSTRUCTION =
@@ -440,324 +281,162 @@
     'numaralandırmak yerine cümle içinde "birincisi, ikincisi" gibi doğal bağlaçlarla anlat. Kısa, net ve ' +
     'samimi bir üslupla, gereksiz uzatmadan cevap ver.';
 
-  // Konuşma sentezine göndermeden önce olası markdown kalıntılarını temizler
   function stripMarkdown(text) {
-    return text
-      .replace(/\*\*(.*?)\*\*/g, '$1')
-      .replace(/\*(.*?)\*/g, '$1')
-      .replace(/__(.*?)__/g, '$1')
-      .replace(/_(.*?)_/g, '$1')
-      .replace(/`{1,3}([^`]*)`{1,3}/g, '$1')
-      .replace(/^#{1,6}\s*/gm, '')
-      .replace(/^[\-\*\+]\s+/gm, '')
-      .replace(/^\d+\.\s+/gm, '')
-      .replace(/\n{2,}/g, '. ')
-      .replace(/\n/g, ' ')
-      .replace(/\s{2,}/g, ' ')
-      .trim();
-  }
-
-  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-  async function callGemini(question) {
-    const res = await fetch(GEMINI_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-goog-api-key': geminiKey
-      },
-      body: JSON.stringify({
-        system_instruction: { parts: [{ text: GEMINI_SYSTEM_INSTRUCTION }] },
-        contents: [{ parts: [{ text: question }] }]
-      })
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      const msg = (data && data.error && data.error.message) ? data.error.message : `HTTP ${res.status}`;
-      const err = new Error(msg);
-      err.status = res.status;
-      throw err;
-    }
-    return data?.candidates?.[0]?.content?.parts?.map(p => p.text).join(' ').trim();
+    return text.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1').replace(/__(.*?)__/g, '$1').replace(/_(.*?)_/g, '$1').replace(/`{1,3}([^`]*)`{1,3}/g, '$1').replace(/^#{1,6}\s*/gm, '').replace(/^[\-\*\+]\s+/gm, '').replace(/^\d+\.\s+/gm, '').replace(/\n{2,}/g, '. ').replace(/\n/g, ' ').replace(/\s{2,}/g, ' ').trim();
   }
 
   async function askGemini(question) {
     if (!geminiKey) {
-      speak('Gemini bağlantısı için önce sağ üstteki ayar simgesinden API anahtarınızı girmeniz gerekiyor efendim.');
-      openSettings();
+      log('sys', 'HATA: Gemini API anahtarı eksik! Sağ üstteki ayarlardan girin.');
+      speak('Efendim, önce sağ üstteki ayarlar menüsünden Gemini API anahtarımı girmelisiniz.');
       return;
     }
-    statusLabel.textContent = 'DÜŞÜNÜYOR…';
-    statusLabel.classList.add('active');
 
-    const isOverloaded = (msg) => /high demand|overloaded|unavailable|503/i.test(msg || '');
-    const isQuota = (msg) => /quota|rate limit|429|exceeded/i.test(msg || '');
-    let lastErr = null;
+    statusLabel.textContent = 'DÜŞÜNÜYOR';
+    statusLabel.className = 'status-label active';
+    hintText.textContent = 'J.A.R.V.I.S. yanıt hazırlıyor...';
 
-    for (let attempt = 0; attempt < 2; attempt++) {
-      try {
-        if (attempt > 0) {
-          log('sys', 'model yoğun, tekrar deneniyor…');
-          await sleep(1800);
-        }
-        const raw = await callGemini(question);
-        if (raw) {
-          speak(stripMarkdown(raw));
-        } else {
-          speak('Gemini bir yanıt döndürmedi efendim, tekrar deneyebilir miyiz?');
-        }
-        return;
-      } catch (err) {
-        lastErr = err;
-        if (!isOverloaded(err.message)) break; // kota veya başka hata ise tekrar deneme, kotayı boşa harcama
+    try {
+      const res = await fetch(GEMINI_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-goog-api-key': geminiKey
+        },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: GEMINI_SYSTEM_INSTRUCTION }] },
+          contents: [{ parts: [{ text: question }] }]
+        })
+      });
+      const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.error?.message || `HTTP ${res.status}`);
       }
+
+      let reply = data.candidates[0].content.parts[0].text;
+      reply = stripMarkdown(reply);
+      
+      log('jarvis', reply);
+      speak(reply);
+      
+    } catch (err) {
+      log('sys', 'Hata: ' + err.message);
+      statusLabel.textContent = 'HATA';
+      statusLabel.className = 'status-label';
+      hintText.textContent = 'Bir hata oluştu, tekrar dene.';
     }
+  }
 
-    log('sys', 'gemini hatası: ' + lastErr.message);
-    if (isQuota(lastErr.message)) {
-      const secMatch = lastErr.message.match(/retry in\s*([\d.]+)\s*s/i);
-      const waitMsg = secMatch ? ` Yaklaşık ${Math.ceil(parseFloat(secMatch[1]))} saniye sonra tekrar deneyebilirsiniz.` : ' Biraz sonra tekrar deneyin.';
-      speak('Gemini için ücretsiz kullanım kotanız doldu efendim.' + waitMsg);
-    } else if (isOverloaded(lastErr.message)) {
-      speak('Gemini şu anda yoğun efendim, birkaç saniye sonra tekrar sorar mısınız?');
-    } else {
-      speak('Gemini ile bağlantı kurarken bir sorun oluştu efendim: ' + lastErr.message);
+    // Ses Sentezleme (Konuşma)
+  function speak(text) {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel(); // Önceki konuşmayı iptal et
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'tr-TR';
+      
+      utterance.onstart = () => {
+        statusLabel.textContent = 'KONUŞUYOR';
+        statusLabel.className = 'status-label speaking';
+        coreBtn.classList.add('speaking');
+        wave.classList.add('on', 'amber');
+      };
+      
+      utterance.onend = () => {
+        statusLabel.textContent = 'BEKLEME MODU';
+        statusLabel.className = 'status-label';
+        coreBtn.classList.remove('speaking');
+        wave.classList.remove('on', 'amber');
+        hintText.textContent = 'Beni etkinleştirmek için ortadaki daireye dokunun.';
+      };
+      
+      window.speechSynthesis.speak(utterance);
     }
   }
 
-  /* ---- decorative tick marks around the core ---- */
-  for (let i = 0; i < 36; i++) {
-    const t = document.createElement('span');
-    t.style.transform = `rotate(${i * 10}deg)`;
-    if (i % 3 !== 0) { t.style.opacity = '0.15'; t.style.height = '5px'; }
-    ticksWrap.appendChild(t);
-  }
+  // Ses Tanıma (Dinleme)
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition;
 
-  /* ---- clock ---- */
-  function tickClock() {
-    const now = new Date();
-    clockTime.textContent = now.toLocaleTimeString('tr-TR', { hour12:false });
-    clockDate.textContent = now.toLocaleDateString('tr-TR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' }).toUpperCase();
-  }
-  tickClock();
-  setInterval(tickClock, 1000);
-
-  /* ---- log helper ---- */
-  function log(who, text) {
-    const line = document.createElement('div');
-    line.className = 'log-line ' + who;
-    const label = who === 'user' ? 'SİZ' : (who === 'jarvis' ? 'JARVIS' : 'SYS');
-    line.innerHTML = `<span class="who">${label} ›</span>${text}`;
-    logPanel.appendChild(line);
-    logPanel.scrollTop = logPanel.scrollHeight;
-  }
-
-  /* ============ SPEECH RECOGNITION SETUP ============ */
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  let recognition = null;
-  let listening = false;
-  let manuallyStopped = true; // user hasn't started yet
-  let speaking = false;
-
-  if (SR) {
-    recognition = new SR();
+  if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
     recognition.lang = 'tr-TR';
-    recognition.continuous = true;
-    recognition.interimResults = true;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
 
-    recognition.onresult = (event) => {
-      let finalText = '';
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        if (event.results[i].isFinal) {
-          finalText += event.results[i][0].transcript;
-        }
-      }
-      if (finalText.trim()) {
-        const cleaned = finalText.trim();
-        // çok kısa / anlamsız algılamaları yok say (ortam gürültüsü, tek harf vb.)
-        if (cleaned.replace(/\s/g, '').length < 2) return;
-        handleUserSpeech(cleaned);
-      }
+    recognition.onstart = () => {
+      statusLabel.textContent = 'DİNLİYOR...';
+      statusLabel.className = 'status-label active';
+      coreBtn.classList.add('listening');
+      wave.classList.add('on');
+      wave.classList.remove('amber');
+      hintText.textContent = 'Sizi dinliyorum efendim...';
     };
 
-    recognition.onerror = (e) => {
-      log('sys', `hata: ${e.error}`);
-      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
-        setListeningUI(false);
-        manuallyStopped = true;
-        statusLabel.textContent = 'MİKROFON REDDEDİLDİ';
-        hintText.textContent = 'Tarayıcı ayarlarından mikrofon iznini etkinleştirin.';
-      }
+    recognition.onresult = (event) => {
+      const userText = event.results[0][0].transcript;
+      log('user', userText);
+      askGemini(userText);
+    };
+
+    recognition.onerror = (event) => {
+      log('sys', 'Ses tanıma hatası: ' + event.error);
+      statusLabel.textContent = 'HATA';
+      coreBtn.classList.remove('listening');
+      wave.classList.remove('on');
+      hintText.textContent = 'Mikrofon hatası. Tekrar deneyin.';
     };
 
     recognition.onend = () => {
-      // Tarayıcı sessizlik nedeniyle kendiliğinden durdurmuş olabilir —
-      // otomatik yeniden başlatma YOK, sadece siz daireye tıklayınca dinler.
-      listening = false;
-      setListeningUI(false);
-    };
-  }
-
-  /* ============ SPEECH SYNTHESIS ============ */
-  let trVoice = null;
-  function pickVoice() {
-    const voices = window.speechSynthesis.getVoices();
-    trVoice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('tr')) || voices[0] || null;
-  }
-  if ('speechSynthesis' in window) {
-    pickVoice();
-    window.speechSynthesis.onvoiceschanged = pickVoice;
-  }
-
-  function speak(text) {
-    log('jarvis', text);
-    if (!('speechSynthesis' in window)) return;
-
-    // konuşurken mikrofonu kapat (kendi sesini dinlemesin) — konuşma bitince
-    // otomatik tekrar dinlemeye BAŞLAMAZ, kullanıcı daireye tekrar tıklamalı.
-    if (recognition && listening) {
-      manuallyStopped = true;
-      try { recognition.stop(); } catch(e) {}
-    }
-
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = 'tr-TR';
-    if (trVoice) utter.voice = trVoice;
-    utter.rate = 1.02;
-    utter.pitch = 0.95;
-
-    speaking = true;
-    setSpeakingUI(true);
-
-    utter.onend = utter.onerror = () => {
-      speaking = false;
-      setSpeakingUI(false);
-    };
-
-    window.speechSynthesis.speak(utter);
-  }
-
-  /* ============ UI STATE HELPERS ============ */
-  function setListeningUI(on) {
-    coreBtn.classList.toggle('listening', on);
-    wave.classList.toggle('on', on);
-    if (on) {
-      statusLabel.textContent = 'DİNLENİYOR…';
-      statusLabel.classList.add('active');
-      statusLabel.classList.remove('speaking');
-      hintText.textContent = 'Sizi dinliyorum. Durdurmak için daireye tekrar dokunun.';
-    } else if (!speaking) {
-      statusLabel.textContent = 'BEKLEME MODU';
-      statusLabel.classList.remove('active');
-      hintText.textContent = 'Beni etkinleştirmek için ortadaki daireye dokunun.';
-    }
-  }
-
-  function setSpeakingUI(on) {
-    coreBtn.classList.toggle('speaking', on);
-    wave.classList.toggle('on', on);
-    wave.classList.toggle('amber', on);
-    if (on) {
-      statusLabel.textContent = 'YANITLIYOR…';
-      statusLabel.classList.add('speaking');
-      statusLabel.classList.remove('active');
-    } else {
-      wave.classList.remove('amber');
-      if (listening) { setListeningUI(true); } else {
+      if (!coreBtn.classList.contains('speaking')) {
         statusLabel.textContent = 'BEKLEME MODU';
-        statusLabel.classList.remove('speaking');
+        statusLabel.className = 'status-label';
+        coreBtn.classList.remove('listening');
+        wave.classList.remove('on');
         hintText.textContent = 'Beni etkinleştirmek için ortadaki daireye dokunun.';
       }
-    }
+    };
+  } else {
+    log('sys', 'Tarayıcınız ses tanımayı desteklemiyor.');
+    overlayErr.textContent = 'Tarayıcınız (veya cihazınız) Web Speech API desteklemiyor. Lütfen Chrome kullanın.';
   }
 
-  /* ============ CORE BUTTON TOGGLE ============ */
-  coreBtn.addEventListener('click', () => {
-    if (!SR) {
-      speak('Üzgünüm efendim, bu tarayıcı ses tanımayı desteklemiyor. Chrome tarayıcısını öneririm.');
-      return;
+  // Başlatma Butonu
+  grantBtn.addEventListener('click', async () => {
+    try {
+      // Mikrofon izni iste
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+      overlay.classList.add('hidden');
+      log('sys', 'Mikrofon erişimi onaylandı. Sistem hazır.');
+      
+      if (!geminiKey) {
+        setTimeout(() => { gearBtn.click(); }, 1000);
+      }
+    } catch (err) {
+      overlayErr.textContent = 'Mikrofon izni reddedildi. Sistemi kullanmak için izin vermelisiniz.';
     }
-    if (listening) {
-      manuallyStopped = true;
-      try { recognition.stop(); } catch(e) {}
-      setListeningUI(false);
-    } else {
-      manuallyStopped = false;
-      try {
+  });
+
+  // Ana Buton (Tıklayınca dinle)
+  coreBtn.addEventListener('click', () => {
+    if (recognition) {
+      if (coreBtn.classList.contains('listening')) {
+        recognition.stop();
+      } else {
         recognition.start();
-        listening = true;
-        setListeningUI(true);
-        log('sys', 'dinleme başlatıldı');
-      } catch(e) {
-        log('sys', 'dinleme başlatılamadı: ' + e.message);
       }
     }
   });
 
-  /* ============ COMMAND PROCESSING ============ */
-  function handleUserSpeech(text) {
-    log('user', text);
-    const t = text.toLowerCase().replace(/[.,!?]/g, '');
-    let reply = null;
-
-    if (/(merhaba|selam|selamlar)/.test(t)) {
-      reply = 'Merhaba efendim, size nasıl yardımcı olabilirim?';
-    } else if (/saat kaç|saati söyle/.test(t)) {
-      reply = `Şu an saat ${new Date().toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})}.`;
-    } else if (/(bugün.*tarih|tarih ne|hangi gün)/.test(t)) {
-      reply = `Bugün ${new Date().toLocaleDateString('tr-TR', {weekday:'long', day:'2-digit', month:'long', year:'numeric'})}.`;
-    } else if (/adın ne|sen kimsin|ismin ne/.test(t)) {
-      reply = 'Ben Jarvis, kişisel sesli asistanınızım.';
-    } else if (/nasılsın/.test(t)) {
-      reply = 'Tüm sistemler normal çalışıyor, teşekkür ederim. Siz nasılsınız?';
-    } else if (/teşekkür/.test(t)) {
-      reply = 'Rica ederim efendim.';
-    } else if (/google.*aç|google'?a git/.test(t)) {
-      reply = 'Google açılıyor.';
-      window.open('https://www.google.com', '_blank');
-    } else if (/youtube.*aç/.test(t)) {
-      reply = 'YouTube açılıyor.';
-      window.open('https://www.youtube.com', '_blank');
-    } else if (/(dur|kapat|sus|dinlemeyi bırak)/.test(t)) {
-      reply = 'Anlaşıldı, dinlemeyi durduruyorum.';
-      manuallyStopped = true;
-      try { recognition.stop(); } catch(e) {}
-    } else if (/şaka|fıkra/.test(t)) {
-      reply = 'Yapay zekalar neden asla yalan söylemez? Çünkü her zaman ayıklanmış veriyle konuşurlar.';
-    }
-
-    if (reply) {
-      speak(reply);
-    } else {
-      // yerel bir komutla eşleşmedi -> Gemini'ye sor
-      askGemini(text);
-    }
+  // Çember üzerindeki çentikleri (ticks) oluştur
+  const ticksWrap = document.getElementById('ticks');
+  for (let i = 0; i < 60; i++) {
+    const span = document.createElement('span');
+    span.style.transform = `rotate(${i * 6}deg)`;
+    ticksWrap.appendChild(span);
   }
 
-  /* ============ MIC PERMISSION GATE ============ */
-  grantBtn.addEventListener('click', async () => {
-    overlayErr.textContent = '';
-    overlaySub.textContent = 'İzin isteniyor…';
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      // stop tracks immediately — recognition API will manage its own stream
-      stream.getTracks().forEach(tr => tr.stop());
-      overlay.classList.add('hidden');
-      log('sys', 'mikrofon izni verildi');
-    } catch (err) {
-      overlayErr.textContent = 'Mikrofon izni reddedildi veya kullanılamıyor: ' + err.message;
-      overlaySub.textContent = 'Devam etmek için tarayıcı ayarlarından izin verin ve tekrar deneyin.';
-    }
-  });
-
-  // If the browser has no mediaDevices support at all
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    overlaySub.textContent = 'Bu tarayıcı mikrofon erişimini desteklemiyor.';
-    grantBtn.disabled = true;
-    grantBtn.style.opacity = 0.4;
-  }
 })();
 </script>
-
 </body>
 </html>
