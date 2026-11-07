@@ -196,7 +196,6 @@
 
 <script>
 (() => {
-  // Elementler
   const overlay = document.getElementById('overlay');
   const grantBtn = document.getElementById('grantBtn');
   const coreBtn = document.getElementById('coreBtn');
@@ -213,6 +212,7 @@
   const saveKeyBtn = document.getElementById('saveKeyBtn');
   const closeSettingsBtn = document.getElementById('closeSettingsBtn');
   const settingsStatus = document.getElementById('settingsStatus');
+  const overlayErr = document.getElementById('overlayErr');
 
   // Saat Güncellemesi
   setInterval(() => {
@@ -235,7 +235,7 @@
   }
 
   // Gemini Ayarları
-  const GEMINI_MODEL = 'gemini-3.8-flash';
+  const GEMINI_MODEL = 'gemini-1.5-flash'; 
   const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
   let geminiKey = '';
 
@@ -297,6 +297,9 @@
     hintText.textContent = 'J.A.R.V.I.S. yanıt hazırlıyor...';
 
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+
       const res = await fetch(GEMINI_URL, {
         method: 'POST',
         headers: {
@@ -306,8 +309,11 @@
         body: JSON.stringify({
           system_instruction: { parts: [{ text: GEMINI_SYSTEM_INSTRUCTION }] },
           contents: [{ parts: [{ text: question }] }]
-        })
+        }),
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
       const data = await res.json();
       
       if (!res.ok) {
@@ -321,122 +327,127 @@
       speak(reply);
       
     } catch (err) {
-      log('sys', 'Hata: ' + err.message);
-      statusLabel.textContent = 'HATA';
-      statusLabel.className = 'status-label';
-      hintText.textContent = 'Bir hata oluştu, tekrar dene.';
-    }
-  }
-
-    // Ses Sentezleme (Konuşma)
-  function speak(text) {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel(); // Önceki konuşmayı iptal et
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'tr-TR';
-      
-      utterance.onstart = () => {
-        statusLabel.textContent = 'KONUŞUYOR';
-        statusLabel.className = 'status-label speaking';
-        coreBtn.classList.add('speaking');
-        wave.classList.add('on', 'amber');
-      };
-      
-      utterance.onend = () => {
-        statusLabel.textContent = 'BEKLEME MODU';
-        statusLabel.className = 'status-label';
-        coreBtn.classList.remove('speaking');
-        wave.classList.remove('on', 'amber');
-        hintText.textContent = 'Beni etkinleştirmek için ortadaki daireye dokunun.';
-      };
-      
-      window.speechSynthesis.speak(utterance);
-    }
-  }
-
-  // Ses Tanıma (Dinleme)
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  let recognition;
-
-  if (SpeechRecognition) {
-    recognition = new SpeechRecognition();
-    recognition.lang = 'tr-TR';
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-
-    recognition.onstart = () => {
-      statusLabel.textContent = 'DİNLİYOR...';
-      statusLabel.className = 'status-label active';
-      coreBtn.classList.add('listening');
-      wave.classList.add('on');
-      wave.classList.remove('amber');
-      hintText.textContent = 'Sizi dinliyorum efendim...';
-    };
-
-    recognition.onresult = (event) => {
-      const userText = event.results[0][0].transcript;
-      log('user', userText);
-      askGemini(userText);
-    };
-
-    recognition.onerror = (event) => {
-      log('sys', 'Ses tanıma hatası: ' + event.error);
-      statusLabel.textContent = 'HATA';
-      coreBtn.classList.remove('listening');
-      wave.classList.remove('on');
-      hintText.textContent = 'Mikrofon hatası. Tekrar deneyin.';
-    };
-
-    recognition.onend = () => {
-      if (!coreBtn.classList.contains('speaking')) {
-        statusLabel.textContent = 'BEKLEME MODU';
-        statusLabel.className = 'status-label';
-        coreBtn.classList.remove('listening');
-        wave.classList.remove('on');
-        hintText.textContent = 'Beni etkinleştirmek için ortadaki daireye dokunun.';
+      if (err.name === 'AbortError') {
+                    log('sys', 'Hata: İstek zaman aşımına uğradı. Sunucu yanıt vermiyor.');
+          } else {
+            log('sys', 'Hata: ' + err.message);
+          }
+          statusLabel.textContent = 'HATA';
+          statusLabel.className = 'status-label';
+          hintText.textContent = 'Bir hata oluştu, tekrar dene.';
+        }
       }
-    };
-  } else {
-    log('sys', 'Tarayıcınız ses tanımayı desteklemiyor.');
-    overlayErr.textContent = 'Tarayıcınız (veya cihazınız) Web Speech API desteklemiyor. Lütfen Chrome kullanın.';
-  }
 
-  // Başlatma Butonu
-  grantBtn.addEventListener('click', async () => {
-    try {
-      // Mikrofon izni iste
-      await navigator.mediaDevices.getUserMedia({ audio: true });
-      overlay.classList.add('hidden');
-      log('sys', 'Mikrofon erişimi onaylandı. Sistem hazır.');
-      
-      if (!geminiKey) {
-        setTimeout(() => { gearBtn.click(); }, 1000);
+      // Ses Sentezleme (Konuşma)
+      function speak(text) {
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = 'tr-TR';
+          
+          utterance.onstart = () => {
+            statusLabel.textContent = 'KONUŞUYOR';
+            statusLabel.className = 'status-label speaking';
+            coreBtn.classList.add('speaking');
+            wave.classList.add('on', 'amber');
+          };
+          
+          utterance.onend = () => {
+            statusLabel.textContent = 'BEKLEME MODU';
+            statusLabel.className = 'status-label';
+            coreBtn.classList.remove('speaking');
+            wave.classList.remove('on', 'amber');
+            hintText.textContent = 'Beni etkinleştirmek için ortadaki daireye dokunun.';
+          };
+          
+          window.speechSynthesis.speak(utterance);
+        }
       }
-    } catch (err) {
-      overlayErr.textContent = 'Mikrofon izni reddedildi. Sistemi kullanmak için izin vermelisiniz.';
-    }
-  });
 
-  // Ana Buton (Tıklayınca dinle)
-  coreBtn.addEventListener('click', () => {
-    if (recognition) {
-      if (coreBtn.classList.contains('listening')) {
-        recognition.stop();
+      // Ses Tanıma (Dinleme)
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      let recognition;
+
+      if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.lang = 'tr-TR';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        recognition.onstart = () => {
+          statusLabel.textContent = 'DİNLİYOR...';
+          statusLabel.className = 'status-label active';
+          coreBtn.classList.add('listening');
+          wave.classList.add('on');
+          wave.classList.remove('amber');
+          hintText.textContent = 'Sizi dinliyorum efendim...';
+        };
+
+        recognition.onresult = (event) => {
+          const userText = event.results[0][0].transcript;
+          log('user', userText);
+          askGemini(userText);
+        };
+
+        recognition.onerror = (event) => {
+          log('sys', 'Ses tanıma hatası: ' + event.error);
+          if (event.error !== 'aborted') {
+            statusLabel.textContent = 'HATA';
+            coreBtn.classList.remove('listening');
+            wave.classList.remove('on');
+            hintText.textContent = 'Mikrofon hatası. Tekrar deneyin.';
+          }
+        };
+
+        recognition.onend = () => {
+          if (!coreBtn.classList.contains('speaking') && statusLabel.textContent !== 'DÜŞÜNÜYOR') {
+            statusLabel.textContent = 'BEKLEME MODU';
+            statusLabel.className = 'status-label';
+            coreBtn.classList.remove('listening');
+            wave.classList.remove('on');
+            hintText.textContent = 'Beni etkinleştirmek için ortadaki daireye dokunun.';
+          }
+        };
       } else {
-        recognition.start();
+        log('sys', 'Tarayıcınız ses tanımayı desteklemiyor.');
+        overlayErr.textContent = 'Tarayıcınız (veya cihazınız) Web Speech API desteklemiyor. Lütfen Chrome kullanın.';
       }
-    }
-  });
 
-  // Çember üzerindeki çentikleri (ticks) oluştur
-  const ticksWrap = document.getElementById('ticks');
-  for (let i = 0; i < 60; i++) {
-    const span = document.createElement('span');
-    span.style.transform = `rotate(${i * 6}deg)`;
-    ticksWrap.appendChild(span);
-  }
+      // Başlatma Butonu
+      grantBtn.addEventListener('click', async () => {
+        try {
+          await navigator.mediaDevices.getUserMedia({ audio: true });
+          overlay.classList.add('hidden');
+          log('sys', 'Mikrofon erişimi onaylandı. Sistem hazır.');
+          
+          if (!geminiKey) {
+            setTimeout(() => { gearBtn.click(); }, 1000);
+          }
+        } catch (err) {
+          overlayErr.textContent = 'Mikrofon izni reddedildi. Sistemi kullanmak için izin vermelisiniz.';
+        }
+      });
 
-})();
-</script>
+      // Ana Buton (Tıklayınca dinle)
+      coreBtn.addEventListener('click', () => {
+        if (recognition) {
+          if (coreBtn.classList.contains('listening')) {
+            recognition.stop();
+          } else {
+            recognition.start();
+          }
+        }
+      });
+
+      // Çember üzerindeki çentikleri (ticks) oluştur
+      const ticksWrap = document.getElementById('ticks');
+      for (let i = 0; i < 60; i++) {
+        const span = document.createElement('span');
+        span.style.transform = `rotate(${i * 6}deg)`;
+        ticksWrap.appendChild(span);
+      }
+
+    })();
+    </script>
 </body>
 </html>
