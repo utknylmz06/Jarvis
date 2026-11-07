@@ -334,7 +334,7 @@
       
     } catch (err) {
       isThinking = false;
-             if (err.name === 'AbortError') {
+      .name === 'AbortError') {
         log('sys', 'Hata: İstek zaman aşımına uğradı. Sunucu yanıt vermiyor.');
       } else {
         log('sys', 'Hata: ' + err.message);
@@ -351,18 +351,24 @@
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'tr-TR';
       
-      // 🎙️ ERKEK SESİ SEÇİMİ VE KALINLAŞTIRMA
       const voices = window.speechSynthesis.getVoices();
-      const maleVoice = voices.find(v => v.lang.startsWith('tr') && (v.name.toLowerCase().includes('tolga') || v.name.toLowerCase().includes('erkek') || v.name.toLowerCase().includes('male')));
       
-      if (maleVoice) {
-          utterance.voice = maleVoice;
+      // İsminde 'tolga', 'erkek' veya 'male' geçen Türkçe bir ses ara
+      let erkekSes = voices.find(v => 
+        v.lang.startsWith('tr') && 
+        (v.name.toLowerCase().includes('male') || 
+         v.name.toLowerCase().includes('erkek') || 
+         v.name.toLowerCase().includes('tolga'))
+      );
+      
+      if (erkekSes) {
+        utterance.voice = erkekSes;
       } else {
-          const trVoice = voices.find(v => v.lang.startsWith('tr'));
-          if (trVoice) utterance.voice = trVoice;
-          utterance.pitch = 0.6; // Sesi kalınlaştır
-          utterance.rate = 0.95; // Biraz ağır konuşsun
+        const trVoice = voices.find(v => v.lang.startsWith('tr'));
+        if (trVoice) utterance.voice = trVoice;
       }
+
+      // PITCH VE RATE AYARLARI SİLİNDİ (Ses doğal kalsın diye)
       
       utterance.onstart = () => {
         isSpeaking = true;
