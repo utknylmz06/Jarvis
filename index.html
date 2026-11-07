@@ -233,7 +233,7 @@
   }
 
   const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
-  const GROQ_MODEL = 'openai/gpt-oss-120b'; // GÜNCEL MODEL
+  const GROQ_MODEL = 'openai/gpt-oss-120b';
   let apiKey = '';
   let isListening = false;
   let isSpeaking = false;
@@ -333,8 +333,8 @@
       speak(reply);
       
     } catch (err) {
-          isThinking = false;
-      if (err.name === 'AbortError') {
+      isThinking = false;
+             if (err.name === 'AbortError') {
         log('sys', 'Hata: İstek zaman aşımına uğradı. Sunucu yanıt vermiyor.');
       } else {
         log('sys', 'Hata: ' + err.message);
@@ -350,6 +350,19 @@
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'tr-TR';
+      
+      // 🎙️ ERKEK SESİ SEÇİMİ VE KALINLAŞTIRMA
+      const voices = window.speechSynthesis.getVoices();
+      const maleVoice = voices.find(v => v.lang.startsWith('tr') && (v.name.toLowerCase().includes('tolga') || v.name.toLowerCase().includes('erkek') || v.name.toLowerCase().includes('male')));
+      
+      if (maleVoice) {
+          utterance.voice = maleVoice;
+      } else {
+          const trVoice = voices.find(v => v.lang.startsWith('tr'));
+          if (trVoice) utterance.voice = trVoice;
+          utterance.pitch = 0.6; // Sesi kalınlaştır
+          utterance.rate = 0.95; // Biraz ağır konuşsun
+      }
       
       utterance.onstart = () => {
         isSpeaking = true;
@@ -410,7 +423,6 @@
 
     recognition.onend = () => {
       isListening = false;
-      // 🚨 Dinleme biter bitmez butonun efektini kesin olarak kaldır
       coreBtn.classList.remove('listening');
       wave.classList.remove('on');
       
@@ -441,7 +453,6 @@
 
   coreBtn.addEventListener('click', () => {
     if (recognition) {
-      // 🚨 Sistem meşgulse butona basmayı yoksay
       if (isThinking || isSpeaking) return; 
 
       if (isListening) {
@@ -450,7 +461,6 @@
         try {
           recognition.start();
         } catch (e) {
-          // Eğer tarayıcı "zaten çalışıyor" derse, önce durdur sonra tekrar başlat
           recognition.stop();
           setTimeout(() => {
              try { recognition.start(); } catch(err) {}
