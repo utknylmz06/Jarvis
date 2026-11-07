@@ -233,8 +233,11 @@
   }
 
   const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
-  const GROQ_MODEL = 'openai/gpt-oss-120b';
+  const GROQ_MODEL = 'openai/gpt-oss-120b'; // GÜNCEL MODEL
   let apiKey = '';
+  let isListening = false;
+  let isSpeaking = false;
+  let isThinking = false;
 
   try {
     const saved = localStorage.getItem('jarvis_groq_key');
@@ -289,6 +292,7 @@
       return;
     }
 
+    isThinking = true;
     statusLabel.textContent = 'DÜŞÜNÜYOR';
     statusLabel.className = 'status-label active';
     hintText.textContent = 'J.A.R.V.I.S. yanıt hazırlıyor...';
@@ -325,9 +329,11 @@
       reply = stripMarkdown(reply);
       
       log('jarvis', reply);
+      isThinking = false;
       speak(reply);
       
     } catch (err) {
+          isThinking = false;
       if (err.name === 'AbortError') {
         log('sys', 'Hata: İstek zaman aşımına uğradı. Sunucu yanıt vermiyor.');
       } else {
@@ -346,6 +352,7 @@
       utterance.lang = 'tr-TR';
       
       utterance.onstart = () => {
+        isSpeaking = true;
         statusLabel.textContent = 'KONUŞUYOR';
         statusLabel.className = 'status-label speaking';
         coreBtn.classList.add('speaking');
@@ -353,6 +360,7 @@
       };
       
       utterance.onend = () => {
+        isSpeaking = false;
         statusLabel.textContent = 'BEKLEME MODU';
         statusLabel.className = 'status-label';
         coreBtn.classList.remove('speaking');
@@ -374,6 +382,7 @@
     recognition.maxAlternatives = 1;
 
     recognition.onstart = () => {
+      isListening = true;
       statusLabel.textContent = 'DİNLİYOR...';
       statusLabel.className = 'status-label active';
       coreBtn.classList.add('listening');
@@ -389,6 +398,7 @@
     };
 
     recognition.onerror = (event) => {
+      isListening = false;
       log('sys', 'Ses tanıma hatası: ' + event.error);
       if (event.error !== 'aborted') {
         statusLabel.textContent = 'HATA';
@@ -399,11 +409,14 @@
     };
 
     recognition.onend = () => {
-      if (!coreBtn.classList.contains('speaking') && statusLabel.textContent !== 'DÜŞÜNÜYOR') {
+      isListening = false;
+      // 🚨 Dinleme biter bitmez butonun efektini kesin olarak kaldır
+      coreBtn.classList.remove('listening');
+      wave.classList.remove('on');
+      
+      if (!isSpeaking && !isThinking) {
         statusLabel.textContent = 'BEKLEME MODU';
         statusLabel.className = 'status-label';
-        coreBtn.classList.remove('listening');
-        wave.classList.remove('on');
         hintText.textContent = 'Beni etkinleştirmek için ortadaki daireye dokunun.';
       }
     };
@@ -428,10 +441,21 @@
 
   coreBtn.addEventListener('click', () => {
     if (recognition) {
-      if (coreBtn.classList.contains('listening')) {
+      // 🚨 Sistem meşgulse butona basmayı yoksay
+      if (isThinking || isSpeaking) return; 
+
+      if (isListening) {
         recognition.stop();
       } else {
-        recognition.start();
+        try {
+          recognition.start();
+        } catch (e) {
+          // Eğer tarayıcı "zaten çalışıyor" derse, önce durdur sonra tekrar başlat
+          recognition.stop();
+          setTimeout(() => {
+             try { recognition.start(); } catch(err) {}
+          }, 200);
+        }
       }
     }
   });
