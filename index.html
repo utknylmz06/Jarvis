@@ -214,14 +214,12 @@
   const settingsStatus = document.getElementById('settingsStatus');
   const overlayErr = document.getElementById('overlayErr');
 
-  // Saat Güncellemesi
   setInterval(() => {
     const now = new Date();
     clockTime.textContent = now.toLocaleTimeString('tr-TR');
     clockDate.textContent = now.toLocaleDateString('tr-TR', { weekday: 'short', day: 'numeric', month: 'short' });
   }, 1000);
 
-  // Log Fonksiyonu
   function log(who, text) {
     const div = document.createElement('div');
     div.className = `log-line ${who}`;
@@ -234,10 +232,9 @@
     logPanel.scrollTop = logPanel.scrollHeight;
   }
 
-  // Groq Ayarları
   const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
-  const GROQ_MODEL = 'llama-3.3-70b-versatile'; // Güçlü, ücretsiz ve stabil model
-  let apiKey = ''; // API anahtarı artık kodun içinde değil, kullanıcı girecek!
+  const GROQ_MODEL = 'llama-3.3-70b-versatile';
+  let apiKey = '';
 
   try {
     const saved = localStorage.getItem('jarvis_groq_key');
@@ -331,127 +328,122 @@
       speak(reply);
       
     } catch (err) {
-             if (err.name === 'AbortError') {
-          log('sys', 'Hata: İstek zaman aşımına uğradı. Sunucu yanıt vermiyor.');
-        } else {
-          log('sys', 'Hata: ' + err.message);
-        }
-        statusLabel.textContent = 'HATA';
+      if (err.name === 'AbortError') {
+        log('sys', 'Hata: İstek zaman aşımına uğradı. Sunucu yanıt vermiyor.');
+      } else {
+        log('sys', 'Hata: ' + err.message);
+      }
+      statusLabel.textContent = 'HATA';
+      statusLabel.className = 'status-label';
+      hintText.textContent = 'Bir hata oluştu, tekrar dene.';
+    }
+  }
+
+  function speak(text) {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'tr-TR';
+      
+      utterance.onstart = () => {
+        statusLabel.textContent = 'KONUŞUYOR';
+        statusLabel.className = 'status-label speaking';
+        coreBtn.classList.add('speaking');
+        wave.classList.add('on', 'amber');
+      };
+      
+      utterance.onend = () => {
+        statusLabel.textContent = 'BEKLEME MODU';
         statusLabel.className = 'status-label';
-        hintText.textContent = 'Bir hata oluştu, tekrar dene.';
+        coreBtn.classList.remove('speaking');
+        wave.classList.remove('on', 'amber');
+        hintText.textContent = 'Beni etkinleştirmek için ortadaki daireye dokunun.';
+      };
+      
+      window.speechSynthesis.speak(utterance);
+    }
+  }
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition;
+
+  if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.lang = 'tr-TR';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+      statusLabel.textContent = 'DİNLİYOR...';
+      statusLabel.className = 'status-label active';
+      coreBtn.classList.add('listening');
+      wave.classList.add('on');
+      wave.classList.remove('amber');
+      hintText.textContent = 'Sizi dinliyorum efendim...';
+    };
+
+    recognition.onresult = (event) => {
+      const userText = event.results[0][0].transcript;
+      log('user', userText);
+      askGroq(userText);
+    };
+
+    recognition.onerror = (event) => {
+      log('sys', 'Ses tanıma hatası: ' + event.error);
+      if (event.error !== 'aborted') {
+        statusLabel.textContent = 'HATA';
+        coreBtn.classList.remove('listening');
+        wave.classList.remove('on');
+        hintText.textContent = 'Mikrofon hatası. Tekrar deneyin.';
+      }
+    };
+
+    recognition.onend = () => {
+      if (!coreBtn.classList.contains('speaking') && statusLabel.textContent !== 'DÜŞÜNÜYOR') {
+        statusLabel.textContent = 'BEKLEME MODU';
+        statusLabel.className = 'status-label';
+        coreBtn.classList.remove('listening');
+        wave.classList.remove('on');
+        hintText.textContent = 'Beni etkinleştirmek için ortadaki daireye dokunun.';
+      }
+    };
+  } else {
+    log('sys', 'Tarayıcınız ses tanımayı desteklemiyor.');
+    overlayErr.textContent = 'Tarayıcınız (veya cihazınız) Web Speech API desteklemiyor. Lütfen Chrome kullanın.';
+  }
+
+  grantBtn.addEventListener('click', async () => {
+    try {
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+      overlay.classList.add('hidden');
+      log('sys', 'Mikrofon erişimi onaylandı. Sistem hazır.');
+      
+      if (!apiKey) {
+        setTimeout(() => { gearBtn.click(); }, 1000);
+      }
+    } catch (err) {
+      overlayErr.textContent = 'Mikrofon izni reddedildi. Sistemi kullanmak için izin vermelisiniz.';
+    }
+  });
+
+  coreBtn.addEventListener('click', () => {
+    if (recognition) {
+      if (coreBtn.classList.contains('listening')) {
+        recognition.stop();
+      } else {
+        recognition.start();
       }
     }
+  });
 
-    // Ses Sentezleme (Konuşma)
-    function speak(text) {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'tr-TR';
-        
-        utterance.onstart = () => {
-          statusLabel.textContent = 'KONUŞUYOR';
-          statusLabel.className = 'status-label speaking';
-          coreBtn.classList.add('speaking');
-          wave.classList.add('on', 'amber');
-        };
-        
-        utterance.onend = () => {
-          statusLabel.textContent = 'BEKLEME MODU';
-          statusLabel.className = 'status-label';
-          coreBtn.classList.remove('speaking');
-          wave.classList.remove('on', 'amber');
-          hintText.textContent = 'Beni etkinleştirmek için ortadaki daireye dokunun.';
-        };
-        
-        window.speechSynthesis.speak(utterance);
-      }
-    }
+  const ticksWrap = document.getElementById('ticks');
+  for (let i = 0; i < 60; i++) {
+    const span = document.createElement('span');
+    span.style.transform = `rotate(${i * 6}deg)`;
+    ticksWrap.appendChild(span);
+  }
 
-    // Ses Tanıma (Dinleme)
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    let recognition;
-
-    if (SpeechRecognition) {
-      recognition = new SpeechRecognition();
-      recognition.lang = 'tr-TR';
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
-
-      recognition.onstart = () => {
-        statusLabel.textContent = 'DİNLİYOR...';
-        statusLabel.className = 'status-label active';
-        coreBtn.classList.add('listening');
-        wave.classList.add('on');
-        wave.classList.remove('amber');
-        hintText.textContent = 'Sizi dinliyorum efendim...';
-      };
-
-      recognition.onresult = (event) => {
-        const userText = event.results[0][0].transcript;
-        log('user', userText);
-        askGroq(userText);
-      };
-
-      recognition.onerror = (event) => {
-        log('sys', 'Ses tanıma hatası: ' + event.error);
-        if (event.error !== 'aborted') {
-          statusLabel.textContent = 'HATA';
-          coreBtn.classList.remove('listening');
-          wave.classList.remove('on');
-          hintText.textContent = 'Mikrofon hatası. Tekrar deneyin.';
-        }
-      };
-
-      recognition.onend = () => {
-        if (!coreBtn.classList.contains('speaking') && statusLabel.textContent !== 'DÜŞÜNÜYOR') {
-          statusLabel.textContent = 'BEKLEME MODU';
-          statusLabel.className = 'status-label';
-          coreBtn.classList.remove('listening');
-          wave.classList.remove('on');
-          hintText.textContent = 'Beni etkinleştirmek için ortadaki daireye dokunun.';
-        }
-      };
-    } else {
-      log('sys', 'Tarayıcınız ses tanımayı desteklemiyor.');
-      overlayErr.textContent = 'Tarayıcınız (veya cihazınız) Web Speech API desteklemiyor. Lütfen Chrome kullanın.';
-    }
-
-    // Başlatma Butonu
-    grantBtn.addEventListener('click', async () => {
-      try {
-        await navigator.mediaDevices.getUserMedia({ audio: true });
-        overlay.classList.add('hidden');
-        log('sys', 'Mikrofon erişimi onaylandı. Sistem hazır.');
-        
-        if (!apiKey) {
-          setTimeout(() => { gearBtn.click(); }, 1000);
-        }
-      } catch (err) {
-        overlayErr.textContent = 'Mikrofon izni reddedildi. Sistemi kullanmak için izin vermelisiniz.';
-      }
-    });
-
-    // Ana Buton (Tıklayınca dinle)
-    coreBtn.addEventListener('click', () => {
-      if (recognition) {
-        if (coreBtn.classList.contains('listening')) {
-          recognition.stop();
-        } else {
-          recognition.start();
-        }
-      }
-    });
-
-    // Çember üzerindeki çentikleri (ticks) oluştur
-    const ticksWrap = document.getElementById('ticks');
-    for (let i = 0; i < 60; i++) {
-      const span = document.createElement('span');
-      span.style.transform = `rotate(${i * 6}deg)`;
-      ticksWrap.appendChild(span);
-    }
-
-  })();
-  </script>
+})();
+</script>
 </body>
 </html>
