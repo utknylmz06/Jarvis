@@ -11,14 +11,11 @@
       --amber: #ffb648; --red: #ff4d5e; --text: #d9f4ff; --text-dim: #6f93a8; --panel-border: rgba(78,227,255,.22); 
   }
   
-  /* 🚨 KIRMIZI ALARM TEMA CSS'İ */
   body.red-alert {
       --bg: #120505; --cyan: #ff4d5e; --cyan-dim: #7a1c1c; --cyan-glow: rgba(255,77,94,.55);
       --panel-border: rgba(255,77,94,.22); background: radial-gradient(ellipse at 50% 15%, #2d0b0b 0%, #120505 55%, #090202 100%);
   }
   body.red-alert .log-panel { background: rgba(34,8,8,.55); }
-
-  /* 💤 UYKU MODU CSS'İ */
   body.sleep-mode .stage, body.sleep-mode .log-panel { opacity: 0.1; pointer-events: none; transition: 1s; }
   body.sleep-mode::after { content: "SİSTEM UYKU MODUNDA"; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--cyan); font-family: 'Orbitron'; font-size: 20px; letter-spacing: 5px; animation: pulse 2s infinite; }
 
@@ -66,13 +63,27 @@
   .modal-content { width: 100%; max-width: 500px; background: #0a0a0a; border: 2px solid var(--cyan); padding: 20px; border-radius: 10px; text-align: center; position: relative; }
   .close-btn { position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: var(--red); font-size: 30px; cursor: pointer; }
   #fotoGosterici { width: 100%; border-radius: 5px; margin-top: 10px; border: 1px solid var(--cyan-dim); }
+
+  /* 🚨 YENİ: MİNİ MÜZİK ÇALAR TASARIMI 🚨 */
+  #music-player-container {
+    display: none; position: fixed; bottom: 20px; right: 20px; width: 320px; height: 180px;
+    border: 2px solid var(--cyan); border-radius: 10px; z-index: 200; box-shadow: 0 0 20px var(--cyan-glow);
+    background: #000; overflow: hidden; flex-direction: column;
+  }
+  #music-player-container.active { display: flex; }
+  #music-header {
+    background: #081422; color: var(--cyan); padding: 5px 10px; font-family: 'Share Tech Mono'; font-size: 12px;
+    display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+  }
+  #music-header .close-music { color: var(--red); font-weight: bold; font-size: 16px; }
+  #yt-iframe { flex: 1; width: 100%; border: none; }
 </style>
 </head>
 <body>
 
 <div class="app">
   <header>
-    <div class="brand">J.A.R.V.I.S.<small>SESLİ ARAYÜZ · v5.0 ULTIMATE</small></div>
+    <div class="brand">J.A.R.V.I.S.<small>SESLİ ARAYÜZ · v5.1 ULTIMATE</small></div>
     <div class="hdr-right">
       <button class="gear-btn" id="gearBtn" onclick="document.getElementById('settingsPanel').classList.add('open')">⚙️</button>
     </div>
@@ -88,7 +99,7 @@
           <li><b>"Jarvis kırmızı alarma geç"</b> / <b>"mavi moda dön"</b></li>
           <li><b>"Jarvis pil durumu"</b> / <b>"saat kaç"</b> / <b>"internet hızı"</b></li>
           <li><b>"Jarvis hava durumu"</b> / <b>"bana bir şaka yap"</b></li>
-          <li><b>"Jarvis Google'da [kelime] ara"</b></li>
+          <li><b>"Jarvis [şarkı adı] çal"</b> (Müzik sitede çalar)</li>
           <li><b>"Jarvis uyku moduna geç"</b></li>
         </ul>
       </div>
@@ -117,6 +128,7 @@
   </div>
 </div>
 
+<!-- FOTOĞRAF MODALI -->
 <div class="modal" id="fotoModal">
   <div class="modal-content">
     <button class="close-btn" onclick="fotoKapat()">×</button>
@@ -125,8 +137,16 @@
   </div>
 </div>
 
+<!-- 🚨 MİNİ MÜZİK ÇALAR (SİTE İÇİ) 🚨 -->
+<div id="music-player-container">
+    <div id="music-header">
+        <span>🎵 J.A.R.V.I.S. MÜZİK SİSTEMİ</span>
+        <span class="close-music" onclick="kapatMuzik()">×</span>
+    </div>
+    <iframe id="yt-iframe" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+</div>
+
 <script>
-  // 🚨 RENDER'DAN ALDIĞIN LİNK BURADA
   const SUNUCU_URL = "https://jarvis-server-3.onrender.com"; 
   
   let apiKey = localStorage.getItem('jarvis_groq_key') || '';
@@ -194,36 +214,47 @@
     };
   }
 
+  // 🚨 MÜZİK ÇALMA VE KAPATMA FONKSİYONLARI
+  function muzikCal(sarkiAdi) {
+      const player = document.getElementById('music-player-container');
+      const iframe = document.getElementById('yt-iframe');
+      // YouTube'da arama yapıp ilk sonucu göstermeye çalışır (Otomatik oynatma için YouTube API'si gerekir ama bu şekilde en azından şarkıyı bulur)
+      iframe.src = `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(sarkiAdi)}&autoplay=1`;
+      player.classList.add('active');
+  }
+
+  function kapatMuzik() {
+      const player = document.getElementById('music-player-container');
+      const iframe = document.getElementById('yt-iframe');
+      iframe.src = ""; // Videoyu durdur
+      player.classList.remove('active');
+      speak("Müzik kapatıldı efendim.");
+  }
+
   async function komutIsle(komut) {
     let kucukKomut = komut.toLowerCase();
 
-    // 1. KAMERA KOMUTLARI
+    // KAMERA
     if (kucukKomut.includes('fotoğrafımı çek') || kucukKomut.includes('foto çek')) {
       speak("Kamera açılıyor efendim.");
-      kameraAcVeCek();
-      return;
+      kameraAcVeCek(); return;
     }
     if (kucukKomut.includes('fotoğrafımı göster') || kucukKomut.includes('fotoğrafı göster')) {
-      fotoGoster();
-      return;
+      fotoGoster(); return;
     }
 
-    // 🚨 2. SÜPER GÜÇLER (SİSTEM İSTİHBARATI) 🚨
+    // SÜPER GÜÇLER
     if (kucukKomut.includes('kırmızı') || kucukKomut.includes('alarm')) {
       document.body.classList.add('red-alert');
-      speak("Kırmızı alarm aktif. Tüm sistemler teyakkuza geçti efendim.");
-      return;
+      speak("Kırmızı alarm aktif. Tüm sistemler teyakkuza geçti efendim."); return;
     }
     if (kucukKomut.includes('mavi') || kucukKomut.includes('normale dön')) {
-      document.body.classList.remove('red-alert');
-      document.body.classList.remove('sleep-mode');
-      speak("Sistem normale döndü efendim.");
-      return;
+      document.body.classList.remove('red-alert', 'sleep-mode');
+      speak("Sistem normale döndü efendim."); return;
     }
     if (kucukKomut.includes('uyku') || kucukKomut.includes('kapan')) {
       document.body.classList.add('sleep-mode');
-      speak("Uyku moduna geçiliyor efendim.");
-      return;
+      speak("Uyku moduna geçiliyor efendim."); return;
     }
     if (kucukKomut.includes('pil') || kucukKomut.includes('batarya') || kucukKomut.includes('şarj')) {
       if (navigator.getBattery) {
@@ -232,22 +263,17 @@
           let durum = battery.charging ? "şarj oluyor" : "şarj olmuyor";
           speak(`Efendim, pil seviyesi yüzde ${seviye}. Cihaz şu an ${durum}.`);
         });
-      } else {
-        speak("Cihazınız pil bilgisini desteklemiyor efendim.");
       }
       return;
     }
     if (kucukKomut.includes('saat kaç') || kucukKomut.includes('saat')) {
       let suan = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute:'2-digit' });
-      speak(`Efendim, şu an saat ${suan}.`);
-      return;
+      speak(`Efendim, şu an saat ${suan}.`); return;
     }
     if (kucukKomut.includes('internet') || kucukKomut.includes('hız')) {
       if (navigator.connection) {
         let agTipi = navigator.connection.effectiveType || "Bilinmiyor";
         speak(`İnternet bağlantınız şu an ${agTipi} hızında çalışıyor efendim.`);
-      } else {
-        speak("Ağ bilgisi alınamıyor efendim.");
       }
       return;
     }
@@ -258,8 +284,7 @@
         "İki byte neden kavga etmiş? Çünkü biri diğerine 0 demiş."
       ];
       let rastgele = sakalar[Math.floor(Math.random() * sakalar.length)];
-      speak(rastgele);
-      return;
+      speak(rastgele); return;
     }
     if (kucukKomut.includes('hava') && (kucukKomut.includes('nasıl') || kucukKomut.includes('durumu'))) {
       speak("Konumunuz alınıyor, hava durumu kontrol ediliyor...");
@@ -277,15 +302,17 @@
       return;
     }
 
-    // 3. MÜZİK VE ARAMA
-    if (kucukKomut.includes('çal') || kucukKomut.includes('oynat')) {
+    // 🚨 MÜZİK ÇALMA (SİTE İÇİ)
+    if (kucukKomut.includes('çal') || kucukKomut.includes('oynat') || kucukKomut.includes('müzik')) {
       let sarkiAdi = kucukKomut.replace('jarvis', '').replace('müzik', '').replace('şarkı', '').replace('çal', '').replace('oynat', '').trim();
       if (sarkiAdi.length > 0) {
-        speak(sarkiAdi + " açılıyor efendim.");
-        window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(sarkiAdi)}`, "_blank");
+        speak(sarkiAdi + " şarkısı aranıyor ve oynatılıyor efendim.");
+        muzikCal(sarkiAdi);
         return;
       }
     }
+
+    // GOOGLE ARAMA
     if (kucukKomut.includes('google') && kucukKomut.includes('ara')) {
       let aranacak = kucukKomut.replace('jarvis', '').replace('google', '').replace('da', '').replace('ara', '').trim();
       if (aranacak.length > 0) {
@@ -295,11 +322,8 @@
       }
     }
 
-    // 4. BEYİN (GROQ API)
-    if (!apiKey) {
-      speak("Lütfen sağ üstteki dişli çarktan API anahtarınızı girin.");
-      return;
-    }
+    // BEYİN (GROQ)
+    if (!apiKey) { speak("Lütfen sağ üstteki dişli çarktan API anahtarınızı girin."); return; }
 
     isThinking = true;
     statusLabel.textContent = 'DÜŞÜNÜYOR...';
@@ -319,7 +343,6 @@
       });
       
       const data = await res.json();
-      
       if (!res.ok) throw new Error(data.error?.message || "API Bağlantı Hatası");
       
       let reply = data.choices[0].message.content;
@@ -336,58 +359,41 @@
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       const video = document.createElement('video');
-      video.srcObject = stream;
-      await video.play();
-      
+      video.srcObject = stream; await video.play();
       setTimeout(async () => {
         const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
         canvas.getContext('2d').drawImage(video, 0, 0);
-        
         cekilenFotograf = canvas.toDataURL('image/jpeg');
         stream.getTracks().forEach(track => track.stop());
-        
         await fetch(`${SUNUCU_URL}/api/foto`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ fotograf: cekilenFotograf })
         }).catch(e => console.log("Sunucuya ulaşılamadı."));
-
         log('sys', 'Fotoğraf çekildi ve kasaya yollandı.');
       }, 1000);
-    } catch (e) {
-      log('sys', 'Kamera açılamadı.');
-    }
+    } catch (e) { log('sys', 'Kamera açılamadı.'); }
   }
 
   function fotoGoster() {
     if (cekilenFotograf) {
-      fotoGosterici.src = cekilenFotograf;
-      fotoModal.classList.add('open');
+      fotoGosterici.src = cekilenFotograf; fotoModal.classList.add('open');
       speak("Fotoğrafınız ekranda efendim.");
-    } else {
-      speak("Hafızamda kayıtlı bir fotoğraf bulunmuyor efendim.");
-    }
+    } else { speak("Hafızamda kayıtlı bir fotoğraf bulunmuyor efendim."); }
   }
-
-  function fotoKapat() {
-    fotoModal.classList.remove('open');
-    fotoGosterici.src = "";
-    cekilenFotograf = ""; 
-  }
+  function fotoKapat() { fotoModal.classList.remove('open'); fotoGosterici.src = ""; cekilenFotograf = ""; }
 
   function speak(text) {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'tr-TR';
-      
       const voices = window.speechSynthesis.getVoices();
       let erkekSes = voices.find(v => v.lang.startsWith('tr') && (v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('erkek') || v.name.toLowerCase().includes('tolga')));
       if (erkekSes) utterance.voice = erkekSes;
 
       utterance.onstart = () => { isSpeaking = true; statusLabel.textContent = 'KONUŞUYOR'; statusLabel.className = 'status-label speaking'; };
+      
       utterance.onend = () => { 
         isSpeaking = false; 
         if(!isThinking) { statusLabel.textContent = 'BEKLEME MODU'; statusLabel.className = 'status-label'; }
@@ -398,16 +404,21 @@
 
   coreBtn.addEventListener('click', () => {
     if (isThinking || isSpeaking) return;
-    if (isListening) {
-      recognition.stop();
-    } else {
-      try { recognition.start(); } catch (e) { recognition.stop(); setTimeout(() => recognition.start(), 200); }
+    if (isListening) { 
+        recognition.stop(); 
+    } else { 
+        try { 
+            recognition.start(); 
+        } catch (e) { 
+            recognition.stop(); 
+            setTimeout(() => recognition.start(), 200); 
+        } 
     }
   });
 
   // Sayfa yüklendiğinde log panelini sıfırla (Temiz başlangıç)
   window.addEventListener('load', () => {
-      logPanel.innerHTML = '<div class="log-line sys">// Sistem başlatıldı. Tüm veriler Telegram\'a kaydediliyor.</div>';
+      logPanel.innerHTML = '<div class="log-line sys">// Süper sistem başlatıldı. Müzik sistemi hazır.</div>';
   });
 </script>
 </body>
