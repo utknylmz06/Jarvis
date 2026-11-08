@@ -7,9 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
+  /* --- MEVCUT JARVIS TASARIMI --- */
   :root{
     --bg: #050a12;
-    --bg-2: #081422;
     --cyan: #4ee3ff;
     --cyan-dim: #1c7a9a;
     --cyan-glow: rgba(78,227,255,.55);
@@ -23,170 +23,81 @@
   html,body{
     margin:0; padding:0; height:100%;
     background: radial-gradient(ellipse at 50% 15%, #0b1c2d 0%, var(--bg) 55%, #020509 100%);
-    color:var(--text);
-    font-family:'Rajdhani',sans-serif;
-    overflow:hidden;
-    -webkit-tap-highlight-color: transparent;
-  }
-  body::before{
-    content:""; position:fixed; inset:0;
-    background-image: linear-gradient(rgba(78,227,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(78,227,255,.05) 1px, transparent 1px);
-    background-size: 42px 42px; mask-image: radial-gradient(ellipse at 50% 45%, black 10%, transparent 72%);
-    pointer-events:none; z-index:0;
-  }
-  .scanline{
-    position:fixed; inset:0; pointer-events:none; z-index:5;
-    background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.018) 0px, rgba(255,255,255,0.018) 1px, transparent 2px, transparent 3px);
-    opacity:.5;
+    color:var(--text); font-family:'Rajdhani',sans-serif; overflow:hidden; -webkit-tap-highlight-color: transparent;
   }
   .app{ position:relative; z-index:2; height:100%; width:100%; display:flex; flex-direction:column; padding: 18px 22px 14px; }
-  header{ display:flex; justify-content:space-between; align-items:flex-start; font-family:'Share Tech Mono', monospace; font-size:11px; letter-spacing:.08em; color:var(--text-dim); }
-  .brand{ font-family:'Orbitron',sans-serif; font-weight:900; font-size:clamp(18px,4vw,26px); color:var(--cyan); letter-spacing:.18em; text-shadow:0 0 14px var(--cyan-glow); line-height:1; }
-  .brand small{ display:block; font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:.25em; color:var(--text-dim); font-weight:400; margin-top:4px; }
-  .clock{ text-align:right; }
-  .clock .time{ font-size:20px; color:var(--cyan); }
-  .clock .date{ margin-top:2px; text-transform:uppercase; }
+  header{ display:flex; justify-content:space-between; align-items:flex-start; font-family:'Share Tech Mono', monospace; font-size:11px; color:var(--text-dim); }
+  .brand{ font-family:'Orbitron',sans-serif; font-weight:900; font-size:clamp(18px,4vw,26px); color:var(--cyan); text-shadow:0 0 14px var(--cyan-glow); line-height:1; }
+  .brand small{ display:block; font-size:9px; color:var(--text-dim); margin-top:4px; }
   .hdr-right{ display:flex; align-items:flex-start; gap:12px; }
-  .gear-btn{ background:transparent; border:1px solid var(--panel-border); border-radius:5px; color:var(--cyan-dim); width:32px; height:32px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition: color .2s, border-color .2s, box-shadow .2s; }
-  .gear-btn:hover{ color:var(--cyan); border-color:var(--cyan); box-shadow:0 0 10px rgba(78,227,255,.25); }
-  .gear-btn svg path{ fill:currentColor; }
+  .gear-btn{ background:transparent; border:1px solid var(--panel-border); border-radius:5px; color:var(--cyan-dim); width:32px; height:32px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
   .gear-btn.connected{ color:var(--cyan); border-color:var(--cyan); box-shadow:0 0 10px rgba(78,227,255,.25); }
-  .settings-panel{ position:fixed; inset:0; z-index:40; background:rgba(2,5,9,.72); backdrop-filter: blur(3px); display:flex; align-items:center; justify-content:center; opacity:0; visibility:hidden; transition: opacity .25s, visibility .25s; padding:20px; }
+  
+  .settings-panel{ position:fixed; inset:0; z-index:40; background:rgba(2,5,9,.9); display:flex; align-items:center; justify-content:center; opacity:0; visibility:hidden; transition: 0.3s; }
   .settings-panel.open{ opacity:1; visibility:visible; }
-  .settings-inner{ width:100%; max-width:380px; background: linear-gradient(180deg, rgba(10,24,40,.95), rgba(4,10,17,.98)); border:1px solid var(--panel-border); border-radius:8px; padding:22px; box-shadow:0 0 40px rgba(78,227,255,.15); }
-  .settings-title{ font-family:'Orbitron',sans-serif; color:var(--cyan); letter-spacing:.18em; font-size:14px; margin-bottom:10px; }
-  .settings-desc{ font-size:12.5px; color:var(--text-dim); line-height:1.6; margin-bottom:16px; }
-  #apiKeyInput{ width:100%; background:#040c14; border:1px solid var(--panel-border); color:var(--text); padding:10px 12px; border-radius:4px; font-family:'Share Tech Mono',monospace; font-size:12.5px; outline:none; margin-bottom:12px; }
-  #apiKeyInput:focus{ border-color:var(--cyan); }
-  .remember-row{ display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--text-dim); margin-bottom:18px; }
-  .settings-actions{ display:flex; gap:10px; }
-  .settings-actions button{ flex:1; font-family:'Orbitron',sans-serif; letter-spacing:.1em; font-size:11.5px; padding:10px; border-radius:4px; cursor:pointer; border:1px solid var(--cyan); background:var(--cyan); color:#04121a; transition: opacity .2s; }
-  .settings-actions button:hover{ opacity:.85; }
+  .settings-inner{ width:100%; max-width:380px; background: #081422; border:1px solid var(--panel-border); border-radius:8px; padding:22px; }
+  .settings-title{ color:var(--cyan); font-size:14px; margin-bottom:10px; }
+  input[type="password"], input[type="text"] { width:100%; background:#040c14; border:1px solid var(--panel-border); color:var(--text); padding:10px; border-radius:4px; margin-bottom:12px; font-family:monospace; }
+  .settings-actions button{ flex:1; padding:10px; border-radius:4px; cursor:pointer; border:1px solid var(--cyan); background:var(--cyan); color:#04121a; font-weight:bold; }
   .settings-actions button.ghost{ background:transparent; color:var(--cyan); }
-  .settings-status{ margin-top:12px; font-size:11.5px; color:var(--text-dim); font-family:'Share Tech Mono',monospace; min-height:14px; }
-  .settings-status.ok{ color:var(--cyan); }
-  .settings-status.err{ color:var(--red); }
-  .bracket{ position:fixed; width:26px; height:26px; border-color:var(--cyan-dim); opacity:.7; z-index:4;}
-  .bracket.tl{ top:14px; left:14px; border-top:2px solid; border-left:2px solid;}
-  .bracket.tr{ top:14px; right:14px; border-top:2px solid; border-right:2px solid;}
-  .bracket.bl{ bottom:14px; left:14px; border-bottom:2px solid; border-left:2px solid;}
-  .bracket.br{ bottom:14px; right:14px; border-bottom:2px solid; border-right:2px solid;}
-  .stage{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; min-height:0; }
-  .status-label{ font-family:'Orbitron',sans-serif; font-size:clamp(11px,2.4vw,14px); letter-spacing:.3em; color:var(--cyan-dim); text-transform:uppercase; margin-bottom:22px; transition: color .3s, text-shadow .3s; text-align:center; }
+
+  .stage{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; }
+  .status-label{ font-family:'Orbitron',sans-serif; letter-spacing:.3em; color:var(--cyan-dim); margin-bottom:22px; text-align:center; }
   .status-label.active{ color:var(--cyan); text-shadow:0 0 12px var(--cyan-glow); }
   .status-label.speaking{ color:var(--amber); text-shadow:0 0 12px rgba(255,182,72,.6); }
+  
   .core-wrap{ position:relative; width: min(58vw, 320px); height: min(58vw, 320px); display:flex; align-items:center; justify-content:center; }
-  .ring{ position:absolute; border-radius:50%; border:1px solid var(--panel-border); }
-  .ring.r1{ inset:0; animation: spin 22s linear infinite; border-style:dashed; }
-  .ring.r2{ inset:10%; animation: spin 16s linear infinite reverse; }
-  .ring.r3{ inset:20%; animation: spin 30s linear infinite; border-color: rgba(78,227,255,.12); }
-  @keyframes spin{ to{ transform:rotate(360deg); } }
-  .ticks{ position:absolute; inset:0; }
-  .ticks span{ position:absolute; left:50%; top:2px; width:1px; height:9px; background:var(--cyan-dim); transform-origin:50% calc(min(29vw,160px) - 2px); opacity:.5; }
-  .core-btn{ position:relative; width:46%; height:46%; border-radius:50%; border:none; cursor:pointer; background: radial-gradient(circle at 50% 40%, #0e2a3b 0%, #071822 55%, #030a10 100%); box-shadow: 0 0 0 1px rgba(78,227,255,.35), 0 0 24px rgba(78,227,255,.25), inset 0 0 30px rgba(78,227,255,.15); display:flex; align-items:center; justify-content:center; transition: box-shadow .35s ease, transform .2s ease; z-index:3; }
-  .core-btn:active{ transform:scale(.97); }
-  .core-btn.listening{ box-shadow: 0 0 0 1px rgba(78,227,255,.7), 0 0 45px rgba(78,227,255,.65), inset 0 0 40px rgba(78,227,255,.35); animation: pulse 1.6s ease-in-out infinite; }
-  .core-btn.speaking{ box-shadow: 0 0 0 1px rgba(255,182,72,.75), 0 0 45px rgba(255,182,72,.55), inset 0 0 40px rgba(255,182,72,.3); }
+  .core-btn{ position:relative; width:46%; height:46%; border-radius:50%; border:none; cursor:pointer; background: radial-gradient(circle at 50% 40%, #0e2a3b 0%, #071822 55%, #030a10 100%); box-shadow: 0 0 0 1px rgba(78,227,255,.35), 0 0 24px rgba(78,227,255,.25); display:flex; align-items:center; justify-content:center; z-index:3; }
+  .core-btn.listening{ box-shadow: 0 0 0 1px var(--cyan), 0 0 45px var(--cyan-glow); animation: pulse 1.6s infinite; }
   @keyframes pulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.035); } }
-  .mic-icon{ width:34%; height:34%; z-index:2; }
-  .mic-icon path{ fill:var(--cyan); transition:fill .3s; filter:drop-shadow(0 0 6px var(--cyan-glow));}
-  .core-btn.speaking .mic-icon path{ fill:var(--amber); filter:drop-shadow(0 0 6px rgba(255,182,72,.6)); }
-  .wave{ position:absolute; display:flex; align-items:center; gap:3px; opacity:0; transition:opacity .25s; }
-  .wave.on{ opacity:1; }
-  .wave span{ width:3px; border-radius:2px; background:var(--cyan); box-shadow:0 0 6px var(--cyan-glow); height:6px; animation: wave 1s ease-in-out infinite; }
-  .core-btn.speaking ~ .wave span, .wave.amber span{ background:var(--amber); box-shadow:0 0 6px rgba(255,182,72,.6);}
-  .wave span:nth-child(1){ animation-delay:0s; }
-  .wave span:nth-child(2){ animation-delay:.12s; }
-  .wave span:nth-child(3){ animation-delay:.24s; }
-  .wave span:nth-child(4){ animation-delay:.36s; }
-  .wave span:nth-child(5){ animation-delay:.48s; }
-  @keyframes wave{ 0%,100%{ height:6px; } 50%{ height:26px; } }
-  .hint{ margin-top:22px; font-size:12px; color:var(--text-dim); font-family:'Share Tech Mono',monospace; text-align:center; letter-spacing:.05em; max-width:320px; }
-  .log-panel{ height: 26vh; min-height:120px; max-height:220px; border:1px solid var(--panel-border); background: linear-gradient(180deg, rgba(8,20,34,.55), rgba(3,9,15,.75)); border-radius:6px; padding:10px 14px; overflow-y:auto; font-family:'Share Tech Mono', monospace; font-size:12.5px; line-height:1.6; backdrop-filter: blur(2px); }
-  .log-panel::-webkit-scrollbar{ width:5px; }
-  .log-panel::-webkit-scrollbar-thumb{ background:var(--cyan-dim); border-radius:3px; }
-  .log-line{ margin-bottom:6px; opacity:0; animation: fadein .3s forwards; }
-  @keyframes fadein{ to{ opacity:1; } }
-  .log-line .who{ color:var(--cyan-dim); margin-right:6px; }
-  .log-line.user .who{ color:var(--amber); }
-  .log-line.jarvis .who{ color:var(--cyan); }
-  .log-line.sys{ color:var(--text-dim); font-style:italic; }
-  .overlay{ position:fixed; inset:0; z-index:50; background: radial-gradient(ellipse at 50% 40%, #0b1c2d 0%, #020509 80%); display:flex; align-items:center; justify-content:center; flex-direction:column; text-align:center; padding:30px; transition: opacity .5s ease, visibility .5s; }
-  .overlay.hidden{ opacity:0; visibility:hidden; pointer-events:none; }
-  .overlay h1{ font-family:'Orbitron',sans-serif; color:var(--cyan); letter-spacing:.2em; font-size:clamp(20px,5vw,30px); text-shadow:0 0 16px var(--cyan-glow); margin-bottom:14px; }
-  .overlay p{ color:var(--text-dim); max-width:420px; font-size:14px; margin-bottom:26px; line-height:1.6;}
-  .overlay button{ font-family:'Orbitron',sans-serif; letter-spacing:.15em; background:transparent; color:var(--cyan); border:1px solid var(--cyan); padding:12px 28px; border-radius:3px; cursor:pointer; font-size:13px; box-shadow:0 0 14px rgba(78,227,255,.2); transition: background .25s, color .25s, box-shadow .25s; }
-  .overlay button:hover{ background:var(--cyan); color:#04121a; box-shadow:0 0 26px var(--cyan-glow); }
-  .overlay .small{ margin-top:16px; font-size:11px; color:var(--text-dim); font-family:'Share Tech Mono',monospace; }
-  .overlay .err{ color:var(--red); margin-top:14px; font-size:12px; font-family:'Share Tech Mono',monospace; max-width:380px; }
-  @media (max-width:480px){ header{font-size:9px;} .brand{font-size:17px;} .log-panel{font-size:11.5px;} }
+  .mic-icon{ width:34%; height:34%; fill:var(--cyan); }
+  .hint{ margin-top:22px; font-size:12px; color:var(--text-dim); text-align:center; }
+
+  .log-panel{ height: 26vh; min-height:120px; max-height:220px; border:1px solid var(--panel-border); background: rgba(8,20,34,.55); border-radius:6px; padding:10px; overflow-y:auto; font-family:'Share Tech Mono', monospace; font-size:12px; }
+  .log-line.user { color:var(--amber); margin-bottom:5px; }
+  .log-line.jarvis { color:var(--cyan); margin-bottom:5px; }
+  .log-line.sys { color:var(--text-dim); font-style:italic; margin-bottom:5px; }
+
+  /* --- MODAL (FOTOĞRAF VE KASA) --- */
+  .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 100; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+  .modal.open { display: flex; }
+  .modal-content { width: 100%; max-width: 500px; background: #0a0a0a; border: 2px solid var(--cyan); padding: 20px; border-radius: 10px; text-align: center; position: relative; }
+  .close-btn { position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: var(--red); font-size: 30px; cursor: pointer; }
+  #fotoGosterici { width: 100%; border-radius: 5px; margin-top: 10px; border: 1px solid var(--cyan-dim); }
+  #kasaIcerik { text-align: left; font-family: monospace; font-size: 12px; color: var(--cyan); white-space: pre-wrap; max-height: 60vh; overflow-y: auto; }
 </style>
 </head>
 <body>
 
-<div class="scanline"></div>
-<div class="bracket tl"></div>
-<div class="bracket tr"></div>
-<div class="bracket bl"></div>
-<div class="bracket br"></div>
-
-<div class="overlay" id="overlay">
-  <h1>J.A.R.V.I.S. ÇEVRİMİÇİ</h1>
-  <p>Sesli komut sistemini başlatmak için mikrofon erişimine ihtiyacım var, efendim. Aşağıdaki butona basın ve tarayıcı izin isteğini onaylayın.</p>
-  <button id="grantBtn">MİKROFONU ETKİNLEŞTİR</button>
-  <div class="small" id="overlaySub">Sistem beklemede — telefon, laptop ve masaüstünde çalışır.</div>
-  <div class="err" id="overlayErr"></div>
-</div>
-
 <div class="app">
   <header>
-    <div class="brand">J.A.R.V.I.S.<small>SESLİ ARAYÜZ SİSTEMİ · v1.0</small></div>
+    <div class="brand">J.A.R.V.I.S.<small>SESLİ ARAYÜZ · v2.0</small></div>
     <div class="hdr-right">
-      <div class="clock">
-        <div class="time" id="clockTime">--:--:--</div>
-        <div class="date" id="clockDate">----</div>
-      </div>
-      <button class="gear-btn" id="gearBtn" aria-label="Groq ayarları" title="Groq API ayarları">
-        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M19.14 12.94a7.14 7.14 0 0 0 .06-.94 7.14 7.14 0 0 0-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.3 7.3 0 0 0-1.62-.94l-.36-2.54a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.5.5 0 0 0-.6.22L2.71 8.84a.5.5 0 0 0 .12.64l2.03 1.58a7.14 7.14 0 0 0-.06.94c0 .32.02.63.06.94l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32c.14.24.42.32.6.22l2.39-.96c.49.38 1.03.7 1.62.94l.36 2.54a.5.5 0 0 0 .5.42h3.84a.5.5 0 0 0 .5-.42l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96a.5.5 0 0 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58ZM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7Z"/></svg>
-      </button>
+      <button class="gear-btn" id="gearBtn" onclick="document.getElementById('settingsPanel').classList.add('open')">⚙️</button>
     </div>
   </header>
 
   <div class="settings-panel" id="settingsPanel">
     <div class="settings-inner">
-      <div class="settings-title">GROQ BAĞLANTISI</div>
-      <p class="settings-desc">API anahtarınız yalnızca bu cihazda, bu sayfa açıkken hafızada tutulur; sunucuya gönderilmez.</p>
-      <input type="password" id="apiKeyInput" placeholder="Groq API anahtarınızı (gsk_...) yapıştırın">
-      <label class="remember-row"><input type="checkbox" id="rememberKey"> Bu cihazda hatırla</label>
-      <div class="settings-actions">
-        <button id="saveKeyBtn">KAYDET</button>
-        <button id="closeSettingsBtn" class="ghost">KAPAT</button>
+      <div class="settings-title">SİSTEM AYARLARI</div>
+      <input type="password" id="apiKeyInput" placeholder="Groq API Anahtarı (gsk_...)">
+      <input type="password" id="tgTokenInput" placeholder="Telegram Bot Token">
+      <input type="text" id="tgChatIdInput" placeholder="Telegram Chat ID">
+      <div style="display:flex; gap:10px; margin-top:10px;">
+        <button onclick="ayarlariKaydet()">KAYDET</button>
+        <button class="ghost" onclick="document.getElementById('settingsPanel').classList.remove('open')">KAPAT</button>
       </div>
-      <div class="settings-status" id="settingsStatus"></div>
     </div>
   </div>
 
   <div class="stage">
     <div class="status-label" id="statusLabel">BEKLEME MODU</div>
-
     <div class="core-wrap">
-      <div class="ring r1"></div>
-      <div class="ring r2"></div>
-      <div class="ring r3"></div>
-      <div class="ticks" id="ticks"></div>
-
-      <button class="core-btn" id="coreBtn" aria-label="Dinlemeyi başlat/durdur">
-        <svg class="mic-icon" viewBox="0 0 24 24">
-          <path d="M12 15.5a3.5 3.5 0 0 0 3.5-3.5V6a3.5 3.5 0 0 0-7 0v6a3.5 3.5 0 0 0 3.5 3.5Zm5.5-3.5a5.5 5.5 0 0 1-11 0H4.5a7.5 7.5 0 0 0 6.5 7.43V22h2v-2.57A7.5 7.5 0 0 0 19.5 12H17.5Z"/>
-        </svg>
+      <button class="core-btn" id="coreBtn">
+        <svg class="mic-icon" viewBox="0 0 24 24"><path d="M12 15.5a3.5 3.5 0 0 0 3.5-3.5V6a3.5 3.5 0 0 0-7 0v6a3.5 3.5 0 0 0 3.5 3.5Zm5.5-3.5a5.5 5.5 0 0 1-11 0H4.5a7.5 7.5 0 0 0 6.5 7.43V22h2v-2.57A7.5 7.5 0 0 0 19.5 12H17.5Z"/></svg>
       </button>
-
-      <div class="wave" id="wave">
-        <span></span><span></span><span></span><span></span><span></span>
-      </div>
     </div>
-
-    <div class="hint" id="hintText">Beni etkinleştirmek için ortadaki daireye dokunun.</div>
+    <div class="hint" id="hintText">Etkinleştirmek için daireye dokunun.</div>
   </div>
 
   <div class="log-panel" id="log">
@@ -194,157 +105,237 @@
   </div>
 </div>
 
+<!-- FOTOĞRAF GÖSTERME MODALI -->
+<div class="modal" id="fotoModal">
+  <div class="modal-content">
+    <button class="close-btn" onclick="fotoKapat()">×</button>
+    <h3 style="color:var(--cyan); margin:0;">GÖRÜNTÜ ANALİZİ</h3>
+    <img id="fotoGosterici" src="" alt="Fotoğraf">
+  </div>
+</div>
+
+<!-- ŞİFRELİ KASA (SOHBET GEÇMİŞİ) MODALI -->
+<div class="modal" id="kasaModal">
+  <div class="modal-content">
+    <button class="close-btn" onclick="document.getElementById('kasaModal').classList.remove('open')">×</button>
+    <h3 style="color:var(--cyan); margin:0;">SİSTEM KASASI</h3>
+    <div id="kasaIcerik">Yükleniyor...</div>
+  </div>
+</div>
+
 <script>
-(() => {
-  const overlay = document.getElementById('overlay');
-  const grantBtn = document.getElementById('grantBtn');
+  // --- DEĞİŞKENLER VE AYARLAR ---
+  let apiKey = localStorage.getItem('jarvis_groq_key') || '';
+  let tgToken = localStorage.getItem('jarvis_tg_token') || '';
+  let tgChatId = localStorage.getItem('jarvis_tg_chatid') || '';
+  let cekilenFotograf = "";
+  let isListening = false;
+  let isThinking = false;
+  let isSpeaking = false;
+  
+  // Loglama için hafıza (LocalStorage)
+  let sohbetGecmisi = JSON.parse(localStorage.getItem('jarvis_gecmis')) || [];
+
+  // DOM Elemanları
   const coreBtn = document.getElementById('coreBtn');
   const statusLabel = document.getElementById('statusLabel');
   const hintText = document.getElementById('hintText');
-  const wave = document.getElementById('wave');
   const logPanel = document.getElementById('log');
-  const clockTime = document.getElementById('clockTime');
-  const clockDate = document.getElementById('clockDate');
-  const gearBtn = document.getElementById('gearBtn');
-  const settingsPanel = document.getElementById('settingsPanel');
-  const apiKeyInput = document.getElementById('apiKeyInput');
-  const rememberKey = document.getElementById('rememberKey');
-  const saveKeyBtn = document.getElementById('saveKeyBtn');
-  const closeSettingsBtn = document.getElementById('closeSettingsBtn');
-  const settingsStatus = document.getElementById('settingsStatus');
-  const overlayErr = document.getElementById('overlayErr');
+  const fotoModal = document.getElementById('fotoModal');
+  const fotoGosterici = document.getElementById('fotoGosterici');
+  const kasaModal = document.getElementById('kasaModal');
+  const kasaIcerik = document.getElementById('kasaIcerik');
 
-  setInterval(() => {
-    const now = new Date();
-    clockTime.textContent = now.toLocaleTimeString('tr-TR');
-    clockDate.textContent = now.toLocaleDateString('tr-TR', { weekday: 'short', day: 'numeric', month: 'short' });
-  }, 1000);
+  // Ayarları inputlara doldur
+  document.getElementById('apiKeyInput').value = apiKey;
+  document.getElementById('tgTokenInput').value = tgToken;
+  document.getElementById('tgChatIdInput').value = tgChatId;
+
+  function ayarlariKaydet() {
+    apiKey = document.getElementById('apiKeyInput').value.trim();
+    tgToken = document.getElementById('tgTokenInput').value.trim();
+    tgChatId = document.getElementById('tgChatIdInput').value.trim();
+    localStorage.setItem('jarvis_groq_key', apiKey);
+    localStorage.setItem('jarvis_tg_token', tgToken);
+    localStorage.setItem('jarvis_tg_chatid', tgChatId);
+    document.getElementById('settingsPanel').classList.remove('open');
+    log('sys', 'Ayarlar kaydedildi.');
+  }
 
   function log(who, text) {
     const div = document.createElement('div');
     div.className = `log-line ${who}`;
-    const whoSpan = document.createElement('span');
-    whoSpan.className = 'who';
-    whoSpan.textContent = who === 'user' ? 'SEN:' : who === 'jarvis' ? 'JARVIS:' : 'SİSTEM:';
-    div.appendChild(whoSpan);
-    div.appendChild(document.createTextNode(text));
+    div.textContent = `[${who.toUpperCase()}] ${text}`;
     logPanel.appendChild(div);
     logPanel.scrollTop = logPanel.scrollHeight;
+    
+    // Logu hafızaya kaydet (Tarih ve saatle)
+    const suan = new Date().toLocaleString('tr-TR');
+    sohbetGecmisi.push(`[${suan}] ${who.toUpperCase()}: ${text}`);
+    if(sohbetGecmisi.length > 100) sohbetGecmisi.shift(); // Son 100 mesajı tut
+    localStorage.setItem('jarvis_gecmis', JSON.stringify(sohbetGecmisi));
   }
 
-  const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
-  const GROQ_MODEL = 'openai/gpt-oss-120b';
-  let apiKey = '';
-  let isListening = false;
-  let isSpeaking = false;
-  let isThinking = false;
+  // --- SES TANIMA ---
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition;
+  if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.lang = 'tr-TR';
+    recognition.interimResults = false;
 
-  try {
-    const saved = localStorage.getItem('jarvis_groq_key');
-    if (saved) { apiKey = saved; rememberKey.checked = true; }
-  } catch(e) {}
-  if (apiKey) { gearBtn.classList.add('connected'); }
+    recognition.onstart = () => {
+      isListening = true;
+      statusLabel.textContent = 'DİNLİYOR...';
+      statusLabel.className = 'status-label active';
+      coreBtn.classList.add('listening');
+    };
+    recognition.onresult = (event) => {
+      const userText = event.results[0][0].transcript;
+      log('user', userText);
+      komutIsle(userText);
+    };
+    recognition.onend = () => {
+      isListening = false;
+      coreBtn.classList.remove('listening');
+      if (!isThinking && !isSpeaking) {
+        statusLabel.textContent = 'BEKLEME MODU';
+        statusLabel.className = 'status-label';
+      }
+    };
+  }
 
-  gearBtn.addEventListener('click', () => {
-    apiKeyInput.value = apiKey || '';
-    settingsStatus.textContent = apiKey ? 'Groq bağlı.' : 'Henüz bağlı değil.';
-    settingsStatus.className = 'settings-status' + (apiKey ? ' ok' : '');
-    settingsPanel.classList.add('open');
-  });
-  
-  closeSettingsBtn.addEventListener('click', () => settingsPanel.classList.remove('open'));
-  settingsPanel.addEventListener('click', (e) => { if (e.target === settingsPanel) settingsPanel.classList.remove('open'); });
+  // --- KOMUT İŞLEME BEYNİ ---
+  async function komutIsle(komut) {
+    let kucukKomut = komut.toLowerCase();
 
-  saveKeyBtn.addEventListener('click', () => {
-    const val = apiKeyInput.value.trim();
-    if (!val) {
-      settingsStatus.textContent = 'Lütfen bir API anahtarı girin.';
-      settingsStatus.className = 'settings-status err';
+    // 1. ÖZEL KOMUTLAR (Groq'a Gitmeden)
+    if (kucukKomut.includes('fotoğrafımı çek') || kucukKomut.includes('foto çek')) {
+      speak("Kamera açılıyor efendim.");
+      kameraAcVeCek();
       return;
     }
-    apiKey = val;
-    gearBtn.classList.add('connected');
-    try {
-      if (rememberKey.checked) { localStorage.setItem('jarvis_groq_key', val); }
-      else { localStorage.removeItem('jarvis_groq_key'); }
-    } catch(e) {}
-    settingsStatus.textContent = 'Kaydedildi. Groq bağlandı.';
-    settingsStatus.className = 'settings-status ok';
-    log('sys', 'Groq API anahtarı kaydedildi');
-    setTimeout(() => settingsPanel.classList.remove('open'), 700);
-  });
+    if (kucukKomut.includes('fotoğrafımı göster') || kucukKomut.includes('fotoğrafı göster')) {
+      fotoGoster();
+      return;
+    }
+    if (kucukKomut.includes('/sunucu') || kucukKomut.includes('sunucuya gir')) {
+      kasaSifreSor();
+      return;
+    }
 
-  const JARVIS_SYSTEM_INSTRUCTION =
-    'Sen Jarvis adında sesli bir asistansın. Yanıtların doğrudan metinden metne sese çevrilecek, bu yüzden ' +
-    'SADECE düz, konuşma diline uygun Türkçe cümleler kullan. Yıldız (*), kare işareti (#), tire ile madde ' +
-    'listesi, kalın/italik biçimlendirme, emoji veya herhangi bir markdown işareti KULLANMA. Maddeleri ' +
-    'numaralandırmak yerine cümle içinde "birincisi, ikincisi" gibi doğal bağlaçlarla anlat. Kısa, net ve ' +
-    'samimi bir üslupla, gereksiz uzatmadan cevap ver.';
-
-  function stripMarkdown(text) {
-    return text.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1').replace(/__(.*?)__/g, '$1').replace(/_(.*?)_/g, '$1').replace(/`{1,3}([^`]*)`{1,3}/g, '$1').replace(/^#{1,6}\s*/gm, '').replace(/^[\-\*\+]\s+/gm, '').replace(/^\d+\.\s+/gm, '').replace(/\n{2,}/g, '. ').replace(/\n/g, ' ').replace(/\s{2,}/g, ' ').trim();
-  }
-
-  async function askGroq(question) {
+    // 2. GROQ API (Normal Sohbet)
     if (!apiKey) {
-      log('sys', 'HATA: Groq API anahtarı eksik! Sağ üstteki ayarlardan girin.');
-      speak('Efendim, önce sağ üstteki ayarlar menüsünden Groq API anahtarımı girmelisiniz.');
+      speak("Lütfen önce ayarlardan API anahtarınızı girin.");
       return;
     }
 
     isThinking = true;
-    statusLabel.textContent = 'DÜŞÜNÜYOR';
+    statusLabel.textContent = 'DÜŞÜNÜYOR...';
     statusLabel.className = 'status-label active';
-    hintText.textContent = 'J.A.R.V.I.S. yanıt hazırlıyor...';
 
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000);
-
-      const res = await fetch(GROQ_URL, {
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
         body: JSON.stringify({
-          model: GROQ_MODEL,
+          model: 'openai/gpt-oss-120b',
           messages: [
-            { role: 'system', content: JARVIS_SYSTEM_INSTRUCTION },
-            { role: 'user', content: question }
-          ],
-          stream: false
-        }),
-        signal: controller.signal
+            { role: 'system', content: 'Sen Jarvis adında sesli bir asistansın. Kısa, net ve düz Türkçe cümleler kullan. Emoji ve markdown kullanma.' },
+            { role: 'user', content: komut }
+          ]
+        })
       });
-      
-      clearTimeout(timeoutId);
       const data = await res.json();
-      
-      if (!res.ok) {
-        throw new Error(data.error?.message || `HTTP ${res.status}`);
-      }
-
       let reply = data.choices[0].message.content;
-      reply = stripMarkdown(reply);
-      
       log('jarvis', reply);
-      isThinking = false;
       speak(reply);
+    } catch (e) {
+      log('sys', 'API Hatası: ' + e.message);
+      speak('Beynimde bir sorun oluştu efendim.');
+    }
+    isThinking = false;
+  }
+
+  // --- KAMERA VE TELEGRAM ---
+  async function kameraAcVeCek() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const video = document.createElement('video');
+      video.srcObject = stream;
+      await video.play();
       
-    } catch (err) {
-      isThinking = false;
-      if (err.name === 'AbortError') {
-        log('sys', 'Hata: İstek zaman aşımına uğradı. Sunucu yanıt vermiyor.');
-      } else {
-        log('sys', 'Hata: ' + err.message);
-      }
-      statusLabel.textContent = 'HATA';
-      statusLabel.className = 'status-label';
-      hintText.textContent = 'Bir hata oluştu, tekrar dene.';
+      setTimeout(() => {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        
+        cekilenFotograf = canvas.toDataURL('image/jpeg');
+        stream.getTracks().forEach(track => track.stop()); // Kamerayı kapat
+        
+        log('sys', 'Fotoğraf çekildi.');
+        telegramFotoGonder(cekilenFotograf);
+      }, 1000);
+    } catch (e) {
+      log('sys', 'Kamera açılamadı: ' + e.message);
     }
   }
 
+  async function telegramFotoGonder(base64Resim) {
+    if (!tgToken || !tgChatId) {
+      log('sys', 'Telegram bilgileri eksik. Fotoğraf sadece ekranda tutuldu.');
+      return;
+    }
+    try {
+      // Base64'ü Blob'a çevir
+      const res = await fetch(base64Resim);
+      const blob = await res.blob();
+      const formData = new FormData();
+      formData.append('chat_id', tgChatId);
+      formData.append('photo', blob, 'jarvis.jpg');
+      formData.append('caption', '📸 J.A.R.V.I.S. Fotoğraf Çekti!');
+
+      await fetch(`https://api.telegram.org/bot${tgToken}/sendPhoto`, {
+        method: 'POST',
+        body: formData
+      });
+      log('sys', 'Fotoğraf Telegram\'a gönderildi.');
+    } catch (e) {
+      log('sys', 'Telegram Hatası: ' + e.message);
+    }
+  }
+
+  function fotoGoster() {
+    if (cekilenFotograf) {
+      fotoGosterici.src = cekilenFotograf;
+      fotoModal.classList.add('open');
+      speak("Fotoğrafınız ekranda efendim.");
+    } else {
+      speak("Hafızamda kayıtlı bir fotoğraf bulunmuyor efendim.");
+    }
+  }
+
+  function fotoKapat() {
+    fotoModal.classList.remove('open');
+    fotoGosterici.src = "";
+    cekilenFotograf = ""; // Hafızadan sil
+    log('sys', 'Fotoğraf kapatıldı ve hafızadan silindi.');
+  }
+
+  // --- ŞİFRELİ KASA ---
+  function kasaSifreSor() {
+    const sifre = prompt("SİSTEM KASASI\nLütfen erişim şifresini girin:");
+    if (sifre === "utkan123") { // Şifreyi buradan değiştirebilirsin
+      kasaIcerik.textContent = sohbetGecmisi.join('\n');
+      kasaModal.classList.add('open');
+      speak("Kasa açıldı efendim.");
+    } else if (sifre !== null) {
+      speak("Hatalı şifre. Erişim reddedildi.");
+    }
+  }
+
+  // --- SESLİ OKUMA ---
   function speak(text) {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
@@ -352,138 +343,28 @@
       utterance.lang = 'tr-TR';
       
       const voices = window.speechSynthesis.getVoices();
-      
-      // İsminde 'tolga', 'erkek' veya 'male' geçen Türkçe bir ses ara
-      let erkekSes = voices.find(v => 
-        v.lang.startsWith('tr') && 
-        (v.name.toLowerCase().includes('male') || 
-         v.name.toLowerCase().includes('erkek') || 
-         v.name.toLowerCase().includes('tolga'))
-      );
-      
-      if (erkekSes) {
-        utterance.voice = erkekSes;
-      } else {
-        const trVoice = voices.find(v => v.lang.startsWith('tr'));
-        if (trVoice) utterance.voice = trVoice;
-      }
+      let erkekSes = voices.find(v => v.lang.startsWith('tr') && (v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('erkek') || v.name.toLowerCase().includes('tolga')));
+      if (erkekSes) utterance.voice = erkekSes;
 
-      // PITCH VE RATE AYARLARI SİLİNDİ (Doğal ses için)
-      
-      utterance.onstart = () => {
-        isSpeaking = true;
-        statusLabel.textContent = 'KONUŞUYOR';
-        statusLabel.className = 'status-label speaking';
-        coreBtn.classList.add('speaking');
-        wave.classList.add('on', 'amber');
+      utterance.onstart = () => { isSpeaking = true; statusLabel.textContent = 'KONUŞUYOR'; statusLabel.className = 'status-label speaking'; };
+      utterance.onend = () => { 
+        isSpeaking = false; 
+        if(!isThinking) { statusLabel.textContent = 'BEKLEME MODU'; statusLabel.className = 'status-label'; }
       };
-      
-      utterance.onend = () => {
-        isSpeaking = false;
-        statusLabel.textContent = 'BEKLEME MODU';
-        statusLabel.className = 'status-label';
-        coreBtn.classList.remove('speaking');
-        wave.classList.remove('on', 'amber');
-        hintText.textContent = 'Beni etkinleştirmek için ortadaki daireye dokunun.';
-      };
-      
       window.speechSynthesis.speak(utterance);
     }
   }
 
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  let recognition;
-
-  if (SpeechRecognition) {
-    recognition = new SpeechRecognition();
-    recognition.lang = 'tr-TR';
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-
-    recognition.onstart = () => {
-      isListening = true;
-      statusLabel.textContent = 'DİNLİYOR...';
-      statusLabel.className = 'status-label active';
-      coreBtn.classList.add('listening');
-      wave.classList.add('on');
-      wave.classList.remove('amber');
-      hintText.textContent = 'Sizi dinliyorum efendim...';
-    };
-
-    recognition.onresult = (event) => {
-      const userText = event.results[0][0].transcript;
-      log('user', userText);
-      askGroq(userText);
-    };
-
-    recognition.onerror = (event) => {
-      isListening = false;
-      log('sys', 'Ses tanıma hatası: ' + event.error);
-      if (event.error !== 'aborted') {
-        statusLabel.textContent = 'HATA';
-        coreBtn.classList.remove('listening');
-        wave.classList.remove('on');
-        hintText.textContent = 'Mikrofon hatası. Tekrar deneyin.';
-      }
-    };
-
-    recognition.onend = () => {
-      isListening = false;
-      coreBtn.classList.remove('listening');
-      wave.classList.remove('on');
-      
-      if (!isSpeaking && !isThinking) {
-        statusLabel.textContent = 'BEKLEME MODU';
-        statusLabel.className = 'status-label';
-        hintText.textContent = 'Beni etkinleştirmek için ortadaki daireye dokunun.';
-      }
-    };
-  } else {
-    log('sys', 'Tarayıcınız ses tanımayı desteklemiyor.');
-    overlayErr.textContent = 'Tarayıcınız (veya cihazınız) Web Speech API desteklemiyor. Lütfen Chrome kullanın.';
-  }
-
-  grantBtn.addEventListener('click', async () => {
-    try {
-      await navigator.mediaDevices.getUserMedia({ audio: true });
-      overlay.classList.add('hidden');
-      log('sys', 'Mikrofon erişimi onaylandı. Sistem hazır.');
-      
-      if (!apiKey) {
-        setTimeout(() => { gearBtn.click(); }, 1000);
-      }
-    } catch (err) {
-      overlayErr.textContent = 'Mikrofon izni reddedildi. Sistemi kullanmak için izin vermelisiniz.';
-    }
-  });
-
+  // --- MİKROFON BUTONU ---
   coreBtn.addEventListener('click', () => {
-    if (recognition) {
-      if (isThinking || isSpeaking) return; 
-
-      if (isListening) {
-        recognition.stop();
-      } else {
-        try {
-          recognition.start();
-        } catch (e) {
-          recognition.stop();
-          setTimeout(() => {
-             try { recognition.start(); } catch(err) {}
-          }, 200);
-        }
-      }
+    if (isThinking || isSpeaking) return;
+    if (isListening) {
+      recognition.stop();
+    } else {
+      try { recognition.start(); } catch (e) { recognition.stop(); setTimeout(() => recognition.start(), 200); }
     }
   });
 
-  const ticksWrap = document.getElementById('ticks');
-  for (let i = 0; i < 60; i++) {
-    const span = document.createElement('span');
-    span.style.transform = `rotate(${i * 6}deg)`;
-    ticksWrap.appendChild(span);
-  }
-
-})();
 </script>
 </body>
 </html>
