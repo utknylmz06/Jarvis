@@ -63,27 +63,13 @@
   .modal-content { width: 100%; max-width: 500px; background: #0a0a0a; border: 2px solid var(--cyan); padding: 20px; border-radius: 10px; text-align: center; position: relative; }
   .close-btn { position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: var(--red); font-size: 30px; cursor: pointer; }
   #fotoGosterici { width: 100%; border-radius: 5px; margin-top: 10px; border: 1px solid var(--cyan-dim); }
-
-  /* 🚨 YENİ: MİNİ MÜZİK ÇALAR TASARIMI 🚨 */
-  #music-player-container {
-    display: none; position: fixed; bottom: 20px; right: 20px; width: 320px; height: 180px;
-    border: 2px solid var(--cyan); border-radius: 10px; z-index: 200; box-shadow: 0 0 20px var(--cyan-glow);
-    background: #000; overflow: hidden; flex-direction: column;
-  }
-  #music-player-container.active { display: flex; }
-  #music-header {
-    background: #081422; color: var(--cyan); padding: 5px 10px; font-family: 'Share Tech Mono'; font-size: 12px;
-    display: flex; justify-content: space-between; align-items: center; cursor: pointer;
-  }
-  #music-header .close-music { color: var(--red); font-weight: bold; font-size: 16px; }
-  #yt-iframe { flex: 1; width: 100%; border: none; }
 </style>
 </head>
 <body>
 
 <div class="app">
   <header>
-    <div class="brand">J.A.R.V.I.S.<small>SESLİ ARAYÜZ · v5.1 ULTIMATE</small></div>
+    <div class="brand">J.A.R.V.I.S.<small>SESLİ ARAYÜZ · v5.2 ULTIMATE</small></div>
     <div class="hdr-right">
       <button class="gear-btn" id="gearBtn" onclick="document.getElementById('settingsPanel').classList.add('open')">⚙️</button>
     </div>
@@ -99,7 +85,7 @@
           <li><b>"Jarvis kırmızı alarma geç"</b> / <b>"mavi moda dön"</b></li>
           <li><b>"Jarvis pil durumu"</b> / <b>"saat kaç"</b> / <b>"internet hızı"</b></li>
           <li><b>"Jarvis hava durumu"</b> / <b>"bana bir şaka yap"</b></li>
-          <li><b>"Jarvis [şarkı adı] çal"</b> (Müzik sitede çalar)</li>
+          <li><b>"Jarvis [şarkı adı] çal"</b> (Pop-up müzik çalar açılır)</li>
           <li><b>"Jarvis uyku moduna geç"</b></li>
         </ul>
       </div>
@@ -128,22 +114,12 @@
   </div>
 </div>
 
-<!-- FOTOĞRAF MODALI -->
 <div class="modal" id="fotoModal">
   <div class="modal-content">
     <button class="close-btn" onclick="fotoKapat()">×</button>
     <h3 style="color:var(--cyan); margin:0;">GÖRÜNTÜ ANALİZİ</h3>
     <img id="fotoGosterici" src="" alt="Fotoğraf">
   </div>
-</div>
-
-<!-- 🚨 MİNİ MÜZİK ÇALAR (SİTE İÇİ) 🚨 -->
-<div id="music-player-container">
-    <div id="music-header">
-        <span>🎵 J.A.R.V.I.S. MÜZİK SİSTEMİ</span>
-        <span class="close-music" onclick="kapatMuzik()">×</span>
-    </div>
-    <iframe id="yt-iframe" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 </div>
 
 <script>
@@ -212,23 +188,6 @@
         statusLabel.className = 'status-label';
       }
     };
-  }
-
-  // 🚨 MÜZİK ÇALMA VE KAPATMA FONKSİYONLARI
-  function muzikCal(sarkiAdi) {
-      const player = document.getElementById('music-player-container');
-      const iframe = document.getElementById('yt-iframe');
-      // YouTube'da arama yapıp ilk sonucu göstermeye çalışır (Otomatik oynatma için YouTube API'si gerekir ama bu şekilde en azından şarkıyı bulur)
-      iframe.src = `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(sarkiAdi)}&autoplay=1`;
-      player.classList.add('active');
-  }
-
-  function kapatMuzik() {
-      const player = document.getElementById('music-player-container');
-      const iframe = document.getElementById('yt-iframe');
-      iframe.src = ""; // Videoyu durdur
-      player.classList.remove('active');
-      speak("Müzik kapatıldı efendim.");
   }
 
   async function komutIsle(komut) {
@@ -302,12 +261,12 @@
       return;
     }
 
-    // 🚨 MÜZİK ÇALMA (SİTE İÇİ)
+    // MÜZİK ÇALMA (POPUP)
     if (kucukKomut.includes('çal') || kucukKomut.includes('oynat') || kucukKomut.includes('müzik')) {
       let sarkiAdi = kucukKomut.replace('jarvis', '').replace('müzik', '').replace('şarkı', '').replace('çal', '').replace('oynat', '').trim();
       if (sarkiAdi.length > 0) {
-        speak(sarkiAdi + " şarkısı aranıyor ve oynatılıyor efendim.");
-        muzikCal(sarkiAdi);
+        speak(sarkiAdi + " şarkısı aranıyor efendim. Lütfen açılan pencereden seçin.");
+        window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(sarkiAdi)}`, 'JarvisMuzik', 'width=400,height=300,scrollbars=yes,resizable=yes');
         return;
       }
     }
@@ -388,12 +347,12 @@
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'tr-TR';
+      
       const voices = window.speechSynthesis.getVoices();
       let erkekSes = voices.find(v => v.lang.startsWith('tr') && (v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('erkek') || v.name.toLowerCase().includes('tolga')));
       if (erkekSes) utterance.voice = erkekSes;
 
       utterance.onstart = () => { isSpeaking = true; statusLabel.textContent = 'KONUŞUYOR'; statusLabel.className = 'status-label speaking'; };
-      
       utterance.onend = () => { 
         isSpeaking = false; 
         if(!isThinking) { statusLabel.textContent = 'BEKLEME MODU'; statusLabel.className = 'status-label'; }
@@ -404,19 +363,10 @@
 
   coreBtn.addEventListener('click', () => {
     if (isThinking || isSpeaking) return;
-    if (isListening) { 
-        recognition.stop(); 
-    } else { 
-        try { 
-            recognition.start(); 
-        } catch (e) { 
-            recognition.stop(); 
-            setTimeout(() => recognition.start(), 200); 
-        } 
-    }
+    if (isListening) { recognition.stop(); } 
+    else { try { recognition.start(); } catch (e) { recognition.stop(); setTimeout(() => recognition.start(), 200); } }
   });
 
-  // Sayfa yüklendiğinde log panelini sıfırla (Temiz başlangıç)
   window.addEventListener('load', () => {
       logPanel.innerHTML = '<div class="log-line sys">// Süper sistem başlatıldı. Müzik sistemi hazır.</div>';
   });
