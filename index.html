@@ -6,17 +6,31 @@
 <title>J.A.R.V.I.S. — Sesli Asistan</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-  :root{ --bg: #050a12; --cyan: #4ee3ff; --cyan-dim: #1c7a9a; --cyan-glow: rgba(78,227,255,.55); --amber: #ffb648; --red: #ff4d5e; --text: #d9f4ff; --text-dim: #6f93a8; --panel-border: rgba(78,227,255,.22); }
+  :root{ 
+      --bg: #050a12; --cyan: #4ee3ff; --cyan-dim: #1c7a9a; --cyan-glow: rgba(78,227,255,.55); 
+      --amber: #ffb648; --red: #ff4d5e; --text: #d9f4ff; --text-dim: #6f93a8; --panel-border: rgba(78,227,255,.22); 
+  }
+  
+  /* 🚨 KIRMIZI ALARM TEMA CSS'İ */
+  body.red-alert {
+      --bg: #120505; --cyan: #ff4d5e; --cyan-dim: #7a1c1c; --cyan-glow: rgba(255,77,94,.55);
+      --panel-border: rgba(255,77,94,.22); background: radial-gradient(ellipse at 50% 15%, #2d0b0b 0%, #120505 55%, #090202 100%);
+  }
+  body.red-alert .log-panel { background: rgba(34,8,8,.55); }
+
+  /* 💤 UYKU MODU CSS'İ */
+  body.sleep-mode .stage, body.sleep-mode .log-panel { opacity: 0.1; pointer-events: none; transition: 1s; }
+  body.sleep-mode::after { content: "SİSTEM UYKU MODUNDA"; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--cyan); font-family: 'Orbitron'; font-size: 20px; letter-spacing: 5px; animation: pulse 2s infinite; }
+
   *{box-sizing:border-box;}
-  html,body{ margin:0; padding:0; height:100%; background: radial-gradient(ellipse at 50% 15%, #0b1c2d 0%, var(--bg) 55%, #020509 100%); color:var(--text); font-family:'Rajdhani',sans-serif; overflow:hidden; }
+  html,body{ margin:0; padding:0; height:100%; background: radial-gradient(ellipse at 50% 15%, #0b1c2d 0%, var(--bg) 55%, #020509 100%); color:var(--text); font-family:'Rajdhani',sans-serif; overflow:hidden; transition: background 0.5s, color 0.5s; }
   .app{ position:relative; z-index:2; height:100%; width:100%; display:flex; flex-direction:column; padding: 18px 22px 14px; }
   header{ display:flex; justify-content:space-between; align-items:flex-start; font-family:'Share Tech Mono', monospace; font-size:11px; color:var(--text-dim); }
-  .brand{ font-family:'Orbitron',sans-serif; font-weight:900; font-size:clamp(18px,4vw,26px); color:var(--cyan); text-shadow:0 0 14px var(--cyan-glow); line-height:1; }
+  .brand{ font-family:'Orbitron',sans-serif; font-weight:900; font-size:clamp(18px,4vw,26px); color:var(--cyan); text-shadow:0 0 14px var(--cyan-glow); line-height:1; transition: color 0.5s; }
   .brand small{ display:block; font-size:9px; color:var(--text-dim); margin-top:4px; }
   
-  /* ÇARK BUTONU GERİ GELDİ */
   .gear-btn{ background:transparent; border:1px solid var(--panel-border); border-radius:5px; color:var(--cyan-dim); width:36px; height:36px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition: 0.2s; font-size: 20px;}
-  .gear-btn:hover{ color:var(--cyan); border-color:var(--cyan); box-shadow: 0 0 10px rgba(78,227,255,.3); }
+  .gear-btn:hover{ color:var(--cyan); border-color:var(--cyan); }
 
   .settings-panel{ position:fixed; inset:0; z-index:40; background:rgba(2,5,9,.9); display:flex; align-items:center; justify-content:center; opacity:0; visibility:hidden; transition: 0.3s; }
   .settings-panel.open{ opacity:1; visibility:visible; }
@@ -30,19 +44,19 @@
   .komut-talimatlari h4 { color: var(--amber); margin: 0 0 8px 0; font-size: 13px; }
   .komut-talimatlari ul { margin: 0; padding-left: 18px; color: var(--text-dim); line-height: 1.5; }
   
-  .stage{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; }
+  .stage{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; transition: opacity 1s; }
   .status-label{ font-family:'Orbitron',sans-serif; letter-spacing:.3em; color:var(--cyan-dim); margin-bottom:22px; text-align:center; }
   .status-label.active{ color:var(--cyan); text-shadow:0 0 12px var(--cyan-glow); }
   .status-label.speaking{ color:var(--amber); text-shadow:0 0 12px rgba(255,182,72,.6); }
   
   .core-wrap{ position:relative; width: min(58vw, 320px); height: min(58vw, 320px); display:flex; align-items:center; justify-content:center; }
-  .core-btn{ position:relative; width:46%; height:46%; border-radius:50%; border:none; cursor:pointer; background: radial-gradient(circle at 50% 40%, #0e2a3b 0%, #071822 55%, #030a10 100%); box-shadow: 0 0 0 1px rgba(78,227,255,.35), 0 0 24px rgba(78,227,255,.25); display:flex; align-items:center; justify-content:center; z-index:3; }
+  .core-btn{ position:relative; width:46%; height:46%; border-radius:50%; border:none; cursor:pointer; background: radial-gradient(circle at 50% 40%, #0e2a3b 0%, #071822 55%, #030a10 100%); box-shadow: 0 0 0 1px rgba(78,227,255,.35), 0 0 24px rgba(78,227,255,.25); display:flex; align-items:center; justify-content:center; z-index:3; transition: box-shadow 0.5s; }
   .core-btn.listening{ box-shadow: 0 0 0 1px var(--cyan), 0 0 45px var(--cyan-glow); animation: pulse 1.6s infinite; }
   @keyframes pulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.035); } }
-  .mic-icon{ width:34%; height:34%; fill:var(--cyan); }
+  .mic-icon{ width:34%; height:34%; fill:var(--cyan); transition: fill 0.5s; }
   .hint{ margin-top:22px; font-size:12px; color:var(--text-dim); text-align:center; }
 
-  .log-panel{ height: 26vh; min-height:120px; max-height:220px; border:1px solid var(--panel-border); background: rgba(8,20,34,.55); border-radius:6px; padding:10px; overflow-y:auto; font-family:'Share Tech Mono', monospace; font-size:12px; }
+  .log-panel{ height: 26vh; min-height:120px; max-height:220px; border:1px solid var(--panel-border); background: rgba(8,20,34,.55); border-radius:6px; padding:10px; overflow-y:auto; font-family:'Share Tech Mono', monospace; font-size:12px; transition: opacity 1s, background 0.5s; }
   .log-line.user { color:var(--amber); margin-bottom:5px; }
   .log-line.jarvis { color:var(--cyan); margin-bottom:5px; }
   .log-line.sys { color:var(--text-dim); font-style:italic; margin-bottom:5px; }
@@ -58,7 +72,7 @@
 
 <div class="app">
   <header>
-    <div class="brand">J.A.R.V.I.S.<small>SESLİ ARAYÜZ · v4.0</small></div>
+    <div class="brand">J.A.R.V.I.S.<small>SESLİ ARAYÜZ · v5.0 ULTIMATE</small></div>
     <div class="hdr-right">
       <button class="gear-btn" id="gearBtn" onclick="document.getElementById('settingsPanel').classList.add('open')">⚙️</button>
     </div>
@@ -69,10 +83,13 @@
       <div class="settings-title">SİSTEM AYARLARI</div>
       
       <div class="komut-talimatlari">
-        <h4>📜 SİSTEM KOMUTLARI</h4>
+        <h4>📜 SÜPER GÜÇLER</h4>
         <ul>
-          <li><b>"Jarvis fotoğrafımı çek"</b> kamerayı açar ve Telegram'a gönderir.</li>
-          <li><b>"Jarvis fotoğrafımı göster"</b> çekilen son fotoğrafı ekranda açar.</li>
+          <li><b>"Jarvis kırmızı alarma geç"</b> / <b>"mavi moda dön"</b></li>
+          <li><b>"Jarvis pil durumu"</b> / <b>"saat kaç"</b> / <b>"internet hızı"</b></li>
+          <li><b>"Jarvis hava durumu"</b> / <b>"bana bir şaka yap"</b></li>
+          <li><b>"Jarvis Google'da [kelime] ara"</b></li>
+          <li><b>"Jarvis uyku moduna geç"</b></li>
         </ul>
       </div>
 
@@ -96,7 +113,7 @@
   </div>
 
   <div class="log-panel" id="log">
-    <div class="log-line sys">// Sunucuya bağlanılıyor...</div>
+    <div class="log-line sys">// Süper sistem başlatıldı. Tüm veriler Telegram'a kaydediliyor.</div>
   </div>
 </div>
 
@@ -180,6 +197,7 @@
   async function komutIsle(komut) {
     let kucukKomut = komut.toLowerCase();
 
+    // 1. KAMERA KOMUTLARI
     if (kucukKomut.includes('fotoğrafımı çek') || kucukKomut.includes('foto çek')) {
       speak("Kamera açılıyor efendim.");
       kameraAcVeCek();
@@ -190,6 +208,94 @@
       return;
     }
 
+    // 🚨 2. SÜPER GÜÇLER (SİSTEM İSTİHBARATI) 🚨
+    if (kucukKomut.includes('kırmızı') || kucukKomut.includes('alarm')) {
+      document.body.classList.add('red-alert');
+      speak("Kırmızı alarm aktif. Tüm sistemler teyakkuza geçti efendim.");
+      return;
+    }
+    if (kucukKomut.includes('mavi') || kucukKomut.includes('normale dön')) {
+      document.body.classList.remove('red-alert');
+      document.body.classList.remove('sleep-mode');
+      speak("Sistem normale döndü efendim.");
+      return;
+    }
+    if (kucukKomut.includes('uyku') || kucukKomut.includes('kapan')) {
+      document.body.classList.add('sleep-mode');
+      speak("Uyku moduna geçiliyor efendim.");
+      return;
+    }
+    if (kucukKomut.includes('pil') || kucukKomut.includes('batarya') || kucukKomut.includes('şarj')) {
+      if (navigator.getBattery) {
+        navigator.getBattery().then(function(battery) {
+          let seviye = Math.round(battery.level * 100);
+          let durum = battery.charging ? "şarj oluyor" : "şarj olmuyor";
+          speak(`Efendim, pil seviyesi yüzde ${seviye}. Cihaz şu an ${durum}.`);
+        });
+      } else {
+        speak("Cihazınız pil bilgisini desteklemiyor efendim.");
+      }
+      return;
+    }
+    if (kucukKomut.includes('saat kaç') || kucukKomut.includes('saat')) {
+      let suan = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute:'2-digit' });
+      speak(`Efendim, şu an saat ${suan}.`);
+      return;
+    }
+    if (kucukKomut.includes('internet') || kucukKomut.includes('hız')) {
+      if (navigator.connection) {
+        let agTipi = navigator.connection.effectiveType || "Bilinmiyor";
+        speak(`İnternet bağlantınız şu an ${agTipi} hızında çalışıyor efendim.`);
+      } else {
+        speak("Ağ bilgisi alınamıyor efendim.");
+      }
+      return;
+    }
+    if (kucukKomut.includes('şaka')) {
+      const sakalar = [
+        "Programcılar neden karanlıkta çalışır? Çünkü ışıklar bug'lara yol açar.",
+        "Bir yazılımcı neden denize girmez? Çünkü C sharp olabilir.",
+        "İki byte neden kavga etmiş? Çünkü biri diğerine 0 demiş."
+      ];
+      let rastgele = sakalar[Math.floor(Math.random() * sakalar.length)];
+      speak(rastgele);
+      return;
+    }
+    if (kucukKomut.includes('hava') && (kucukKomut.includes('nasıl') || kucukKomut.includes('durumu'))) {
+      speak("Konumunuz alınıyor, hava durumu kontrol ediliyor...");
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            try {
+                let lat = pos.coords.latitude; let lon = pos.coords.longitude;
+                let res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+                let data = await res.json();
+                let derece = data.current_weather.temperature;
+                speak(`Bulunduğunuz konumda hava sıcaklığı şu an ${derece} derece efendim.`);
+            } catch(e) { speak("Hava durumu sunucusuna ulaşılamadı."); }
+        }, () => { speak("Konum izni verilmediği için hava durumunu gösteremiyorum."); });
+      }
+      return;
+    }
+
+    // 3. MÜZİK VE ARAMA
+    if (kucukKomut.includes('çal') || kucukKomut.includes('oynat')) {
+      let sarkiAdi = kucukKomut.replace('jarvis', '').replace('müzik', '').replace('şarkı', '').replace('çal', '').replace('oynat', '').trim();
+      if (sarkiAdi.length > 0) {
+        speak(sarkiAdi + " açılıyor efendim.");
+        window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(sarkiAdi)}`, "_blank");
+        return;
+      }
+    }
+    if (kucukKomut.includes('google') && kucukKomut.includes('ara')) {
+      let aranacak = kucukKomut.replace('jarvis', '').replace('google', '').replace('da', '').replace('ara', '').trim();
+      if (aranacak.length > 0) {
+        speak(aranacak + " aranıyor.");
+        window.open(`https://www.google.com/search?q=${encodeURIComponent(aranacak)}`, "_blank");
+        return;
+      }
+    }
+
+    // 4. BEYİN (GROQ API)
     if (!apiKey) {
       speak("Lütfen sağ üstteki dişli çarktan API anahtarınızı girin.");
       return;
@@ -214,9 +320,7 @@
       
       const data = await res.json();
       
-      if (!res.ok) {
-          throw new Error(data.error?.message || "API Bağlantı Hatası");
-      }
+      if (!res.ok) throw new Error(data.error?.message || "API Bağlantı Hatası");
       
       let reply = data.choices[0].message.content;
       log('jarvis', reply);
@@ -299,6 +403,11 @@
     } else {
       try { recognition.start(); } catch (e) { recognition.stop(); setTimeout(() => recognition.start(), 200); }
     }
+  });
+
+  // Sayfa yüklendiğinde log panelini sıfırla (Temiz başlangıç)
+  window.addEventListener('load', () => {
+      logPanel.innerHTML = '<div class="log-line sys">// Sistem başlatıldı. Tüm veriler Telegram\'a kaydediliyor.</div>';
   });
 </script>
 </body>
