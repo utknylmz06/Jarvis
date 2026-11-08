@@ -6,16 +6,29 @@
 <title>J.A.R.V.I.S. — Sesli Asistan</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg: #050a12; --cyan: #4ee3ff; --cyan-dim: #1c7a9a; --cyan-glow: rgba(78,227,255,.55);
-    --amber: #ffb648; --red: #ff4d5e; --text: #d9f4ff; --text-dim: #6f93a8; --panel-border: rgba(78,227,255,.22);
-  }
+  :root{ --bg: #050a12; --cyan: #4ee3ff; --cyan-dim: #1c7a9a; --cyan-glow: rgba(78,227,255,.55); --amber: #ffb648; --red: #ff4d5e; --text: #d9f4ff; --text-dim: #6f93a8; --panel-border: rgba(78,227,255,.22); }
   *{box-sizing:border-box;}
   html,body{ margin:0; padding:0; height:100%; background: radial-gradient(ellipse at 50% 15%, #0b1c2d 0%, var(--bg) 55%, #020509 100%); color:var(--text); font-family:'Rajdhani',sans-serif; overflow:hidden; }
   .app{ position:relative; z-index:2; height:100%; width:100%; display:flex; flex-direction:column; padding: 18px 22px 14px; }
   header{ display:flex; justify-content:space-between; align-items:flex-start; font-family:'Share Tech Mono', monospace; font-size:11px; color:var(--text-dim); }
   .brand{ font-family:'Orbitron',sans-serif; font-weight:900; font-size:clamp(18px,4vw,26px); color:var(--cyan); text-shadow:0 0 14px var(--cyan-glow); line-height:1; }
   .brand small{ display:block; font-size:9px; color:var(--text-dim); margin-top:4px; }
+  
+  /* ÇARK BUTONU GERİ GELDİ */
+  .gear-btn{ background:transparent; border:1px solid var(--panel-border); border-radius:5px; color:var(--cyan-dim); width:36px; height:36px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition: 0.2s; font-size: 20px;}
+  .gear-btn:hover{ color:var(--cyan); border-color:var(--cyan); box-shadow: 0 0 10px rgba(78,227,255,.3); }
+
+  .settings-panel{ position:fixed; inset:0; z-index:40; background:rgba(2,5,9,.9); display:flex; align-items:center; justify-content:center; opacity:0; visibility:hidden; transition: 0.3s; }
+  .settings-panel.open{ opacity:1; visibility:visible; }
+  .settings-inner{ width:100%; max-width:380px; background: #081422; border:1px solid var(--panel-border); border-radius:8px; padding:22px; }
+  .settings-title{ color:var(--cyan); font-size:14px; margin-bottom:10px; font-family: 'Orbitron', sans-serif; }
+  input[type="password"] { width:100%; background:#040c14; border:1px solid var(--panel-border); color:var(--text); padding:10px; border-radius:4px; margin-bottom:12px; font-family:monospace; }
+  .settings-actions button{ flex:1; padding:10px; border-radius:4px; cursor:pointer; border:1px solid var(--cyan); background:var(--cyan); color:#04121a; font-weight:bold; }
+  .settings-actions button.ghost{ background:transparent; color:var(--cyan); }
+
+  .komut-talimatlari { background: rgba(4, 12, 20, 0.8); border: 1px dashed var(--cyan-dim); border-radius: 6px; padding: 12px; margin-bottom: 15px; text-align: left; font-size: 12.5px; }
+  .komut-talimatlari h4 { color: var(--amber); margin: 0 0 8px 0; font-size: 13px; }
+  .komut-talimatlari ul { margin: 0; padding-left: 18px; color: var(--text-dim); line-height: 1.5; }
   
   .stage{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; }
   .status-label{ font-family:'Orbitron',sans-serif; letter-spacing:.3em; color:var(--cyan-dim); margin-bottom:22px; text-align:center; }
@@ -43,13 +56,34 @@
 </head>
 <body>
 
-<!-- 🚨 TELEGRAM.JS DOSYASINI BURAYA ÇAĞIRIYORUZ -->
-<script src="Telegram.js"></script>
-
 <div class="app">
   <header>
-    <div class="brand">J.A.R.V.I.S.<small>SESLİ ARAYÜZ · v3.0</small></div>
+    <div class="brand">J.A.R.V.I.S.<small>SESLİ ARAYÜZ · v4.0</small></div>
+    <div class="hdr-right">
+      <button class="gear-btn" id="gearBtn" onclick="document.getElementById('settingsPanel').classList.add('open')">⚙️</button>
+    </div>
   </header>
+
+  <div class="settings-panel" id="settingsPanel">
+    <div class="settings-inner">
+      <div class="settings-title">SİSTEM AYARLARI</div>
+      
+      <div class="komut-talimatlari">
+        <h4>📜 SİSTEM KOMUTLARI</h4>
+        <ul>
+          <li><b>"Jarvis fotoğrafımı çek"</b> kamerayı açar ve Telegram'a gönderir.</li>
+          <li><b>"Jarvis fotoğrafımı göster"</b> çekilen son fotoğrafı ekranda açar.</li>
+        </ul>
+      </div>
+
+      <p style="font-size:12px; color:var(--text-dim); margin-top: 0;">Beyni aktif etmek için Groq API anahtarınızı girin.</p>
+      <input type="password" id="apiKeyInput" placeholder="Groq API Anahtarı (gsk_...)">
+      <div style="display:flex; gap:10px; margin-top:10px;">
+        <button onclick="ayarlariKaydet()">KAYDET</button>
+        <button class="ghost" onclick="document.getElementById('settingsPanel').classList.remove('open')">KAPAT</button>
+      </div>
+    </div>
+  </div>
 
   <div class="stage">
     <div class="status-label" id="statusLabel">BEKLEME MODU</div>
@@ -62,7 +96,7 @@
   </div>
 
   <div class="log-panel" id="log">
-    <div class="log-line sys">// Sistem başlatıldı. Tüm veriler Telegram'a kaydediliyor.</div>
+    <div class="log-line sys">// Sunucuya bağlanılıyor...</div>
   </div>
 </div>
 
@@ -75,9 +109,10 @@
 </div>
 
 <script>
-  // 🚨 BURAYA KENDİ GROQ API ANAHTARINI GİR KANKA (Yapay zeka beyni için)
-  const GROQ_API_KEY = "BURAYA_GROQ_API_ANAHTARINI_YAZ";
-
+  // 🚨 RENDER'DAN ALDIĞIN LİNK BURADA
+  const SUNUCU_URL = "https://jarvis-server-3.onrender.com"; 
+  
+  let apiKey = localStorage.getItem('jarvis_groq_key') || '';
   let cekilenFotograf = "";
   let isListening = false;
   let isThinking = false;
@@ -85,21 +120,32 @@
 
   const coreBtn = document.getElementById('coreBtn');
   const statusLabel = document.getElementById('statusLabel');
-  const hintText = document.getElementById('hintText');
   const logPanel = document.getElementById('log');
   const fotoModal = document.getElementById('fotoModal');
   const fotoGosterici = document.getElementById('fotoGosterici');
 
-  function log(who, text) {
+  document.getElementById('apiKeyInput').value = apiKey;
+
+  function ayarlariKaydet() {
+    apiKey = document.getElementById('apiKeyInput').value.trim();
+    localStorage.setItem('jarvis_groq_key', apiKey);
+    document.getElementById('settingsPanel').classList.remove('open');
+    log('sys', 'API anahtarı başarıyla güncellendi.');
+  }
+
+  async function log(who, text) {
     const div = document.createElement('div');
     div.className = `log-line ${who}`;
     div.textContent = `[${who.toUpperCase()}] ${text}`;
     logPanel.appendChild(div);
     logPanel.scrollTop = logPanel.scrollHeight;
     
-    // 🚨 Her konuşmayı Telegram.js içindeki fonksiyonla Telegram'a yolla
     if (who === 'user' || who === 'jarvis') {
-        telegramMesajGonder(who.toUpperCase(), text);
+        await fetch(`${SUNUCU_URL}/api/log`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ kim: who.toUpperCase(), mesaj: text })
+        }).catch(e => console.log("Sunucuya ulaşılamadı."));
     }
   }
 
@@ -135,12 +181,17 @@
     let kucukKomut = komut.toLowerCase();
 
     if (kucukKomut.includes('fotoğrafımı çek') || kucukKomut.includes('foto çek')) {
-      speak("Kamera açılıyor efendim. Fotoğrafınız çekiliyor.");
+      speak("Kamera açılıyor efendim.");
       kameraAcVeCek();
       return;
     }
     if (kucukKomut.includes('fotoğrafımı göster') || kucukKomut.includes('fotoğrafı göster')) {
       fotoGoster();
+      return;
+    }
+
+    if (!apiKey) {
+      speak("Lütfen sağ üstteki dişli çarktan API anahtarınızı girin.");
       return;
     }
 
@@ -151,16 +202,22 @@
     try {
       const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_API_KEY}` },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
         body: JSON.stringify({
-          model: 'openai/gpt-oss-120b',
+          model: 'llama-3.1-8b-instant', // Groq'un en stabil modeli
           messages: [
             { role: 'system', content: 'Sen Jarvis adında sesli bir asistansın. Kısa, net ve düz Türkçe cümleler kullan.' },
             { role: 'user', content: komut }
           ]
         })
       });
+      
       const data = await res.json();
+      
+      if (!res.ok) {
+          throw new Error(data.error?.message || "API Bağlantı Hatası");
+      }
+      
       let reply = data.choices[0].message.content;
       log('jarvis', reply);
       speak(reply);
@@ -178,7 +235,7 @@
       video.srcObject = stream;
       await video.play();
       
-      setTimeout(() => {
+      setTimeout(async () => {
         const canvas = document.createElement('canvas');
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
@@ -187,12 +244,16 @@
         cekilenFotograf = canvas.toDataURL('image/jpeg');
         stream.getTracks().forEach(track => track.stop());
         
-        // 🚨 Fotoğrafı Telegram.js içindeki fonksiyonla Telegram'a yolla
-        telegramFotoGonder(cekilenFotograf);
-        log('sys', 'Fotoğraf çekildi ve kasaya (Telegram) yollandı.');
+        await fetch(`${SUNUCU_URL}/api/foto`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fotograf: cekilenFotograf })
+        }).catch(e => console.log("Sunucuya ulaşılamadı."));
+
+        log('sys', 'Fotoğraf çekildi ve kasaya yollandı.');
       }, 1000);
     } catch (e) {
-      log('sys', 'Kamera açılamadı: ' + e.message);
+      log('sys', 'Kamera açılamadı.');
     }
   }
 
@@ -238,11 +299,6 @@
     } else {
       try { recognition.start(); } catch (e) { recognition.stop(); setTimeout(() => recognition.start(), 200); }
     }
-  });
-
-  // Sayfa kapandığında hafızayı temizle (Kasa Telegram'da olduğu için burası sıfırlanır)
-  window.addEventListener('beforeunload', () => {
-      logPanel.innerHTML = "";
   });
 </script>
 </body>
